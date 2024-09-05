@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Hakem Düzenle{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+<div></div>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="form-group">
+            {% if hakem.foto %}
+                <img src="{{ url_for('static', filename='uploads/' + hakem.foto) }}" alt="Hakem Fotoğrafı" class="img-thumbnail mb-3" style="width: 200px; height: 200px;">
+            {% endif %}
+            <label for="foto">Fotoğraf:</label>
+            <input type="file" class="form-control-file" name="foto">
+        </div>
+{% if session['role'] == 'Yonetici' %}
+    <div class="form-group">
+        <label for="derece">Derece:</label>
+        <select class="form-control" name="derece">
+            <option value="">-- Derece Seçiniz --</option>
+            <option value="Aday Hakem" {% if hakem.derece == 'Aday Hakem' %}selected{% endif %}>Aday Hakem</option>
+            <option value="İl Hakemi" {% if hakem.derece == 'İl Hakemi' %}selected{% endif %}>İl Hakemi</option>
+            <option value="Ulusal Hakem" {% if hakem.derece == 'Ulusal Hakem' %}selected{% endif %}>Ulusal Hakem</option>
+            <option value="Uluslararası Hakem" {% if hakem.derece == 'Uluslararası Hakem' %}selected{% endif %}>Uluslararası Hakem</option>
+        </select>
+    </div>
+{% else %}
+    <input type="hidden" name="derece" value="{{ hakem.derece }}">
+{% endif %}
+
+{% if session['role'] in ['Yonetici'] %}
+    <div class="form-group">
+        <label for="kutuk_no">Kütük No:</label>
+        <input type="text" class="form-control" name="kutuk_no" value="{{ hakem.kutuk_no }}">
+    </div>
+{% else %}
+    <input type="hidden" name="kutuk_no" value="{{ hakem.kutuk_no }}">
+{% endif %}
+
+        <div class="form-group">
+            <label for="tc_kimlik_no">T.C. Kimlik No:</label>
+            <input type="text" class="form-control" name="tc_kimlik_no" value="{{ hakem.tc_kimlik_no }}" required>
+        </div>
+        <div class="form-group">
+            <label for="ad_soyad">Ad Soyad:</label>
+            <input type="text" class="form-control" name="ad_soyad" value="{{ hakem.ad_soyad }}" required>
+        </div>
+		        <div class="form-group">
+            <label for="dogum_tarihi">Doğum Tarihi:</label>
+<input type="date" class="form-control" name="dogum_tarihi" value="{{ hakem.dogum_tarihi | date }}">
+			</div>
+        <!-- Diğer form alanlarınız burada -->
+
+
+
+        <div class="form-group">
+            <label for="telefon">Telefon:</label>
+            <input type="tel" class="form-control" name="telefon" value="{{ hakem.telefon }}">
+        </div>
+        <div class="form-group">
+            <label for="eposta">E-posta:</label>
+            <input type="email" class="form-control" name="eposta" value="{{ hakem.eposta }}">
+        </div>
+		        </div>
+        <div class="form-group">
+            <label for="iban">IBAN:</label>
+            <input type="text" class="form-control" name="iban" value="{{ hakem.iban }}">
+        </div>
+        <div class="form-group">
+            <label for="adres">Adres:</label>
+            <textarea class="form-control" name="adres">{{ hakem.adres }}</textarea>
+        </div>
+		        <div class="form-group">
+            <label for="hakem_ili">Hakem İli:</label>
+            <input type="text" class="form-control" name="hakem_ili" value="{{ hakem.il }}">
+        </div>
+        <div class="form-group">
+            <label for="izin_adresi">İş yeri ve adresi:</label>
+            <textarea class="form-control" name="izin_adresi">{{ hakem.izin_adresi }}</textarea>
+
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+    </form>
+</div>
+{% endblock %}

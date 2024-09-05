@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}İl Temsilcisi Düzenle{% endblock %}
+
+{% block content %}
+<div></div>
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+  <div class="form-group">
+    {% if temsilci.foto %}
+    <label>Fotoğraf:</label>
+    <div class="mb-2">
+        <img src="{{ url_for('static', filename='uploads/' ~ temsilci.foto) }}" alt="Temsilci Fotoğrafı" height="100">
+    </div>
+    {% endif %}
+    <label for="foto">Yeni Fotoğraf Yükle:</label>
+    <input type="file" class="form-control-file" name="foto" id="foto">
+</div>
+
+    <div class="form-group">
+        <label for="ad_soyad">Ad Soyad:</label>
+        <input type="text" class="form-control" name="ad_soyad" id="ad_soyad" value="{{ temsilci.ad_soyad }}" required>
+    </div>
+    <div class="form-group">
+        <label for="tc_kimlik_no">TC Kimlik No:</label>
+        <input type="text" class="form-control" name="tc_kimlik_no" id="tc_kimlik_no" value="{{ temsilci.tc_kimlik_no }}" required>
+    </div>
+    <div class="form-group">
+        <label for="il">İl:</label>
+        <input type="text" class="form-control" name="il" id="il" value="{{ temsilci.il }}" required>
+    </div>
+    <div class="form-group">
+        <label for="telefon">Telefon:</label>
+        <input type="text" class="form-control" name="telefon" id="telefon" value="{{ temsilci.telefon }}">
+    </div>
+    <div class="form-group">
+        <label for="eposta">Eposta:</label>
+        <input type="email" class="form-control" name="eposta" id="eposta" value="{{ temsilci.eposta }}">
+    </div>
+    <div class="form-group">
+        <label for="il">Adres:</label>
+        <input type="text" class="form-control" name="adres" id="adres" value="{{ temsilci.adres }}" required>
+    </div>
+
+	
+	<div class="form-group">
+        <label for="kullanici_adi">Kullanıcı Adı:</label>
+        <input type="text" class="form-control" name="kullanici_adi" id="kullanici_adi" value="{{ kullanici.kullanici_adi }}" required>
+    </div>
+    <div class="form-group">
+        <label for="yeni_sifre">Yeni Şifre (boş bırakırsanız değişmez):</label>
+        <input type="password" class="form-control" name="yeni_sifre" id="yeni_sifre">
+    </div>
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+</form>
+{% endblock %}

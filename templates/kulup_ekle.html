@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Kulüp Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white rounded-top">
+            <h3 class="mb-0">Kulüp Ekle</h3>
+        </div>
+        <div class="card-body p-5">
+            {% if get_flashed_messages() %}
+                <div class="alert alert-success" role="alert">
+                    {{ get_flashed_messages()[0] }}
+                </div>
+            {% endif %}
+
+            <form action="{{ url_for('kulup_ekle') }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <div class="form-group mb-4">
+                    <label for="logo" class="form-label">Kulüp Logosu</label>
+                    <input type="file" class="form-control p-3" id="logo" name="logo">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="kulupAdi" class="form-label">Kulüp Adı</label>
+                    <input type="text" class="form-control p-3" id="kulupAdi" name="kulup_adi" required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="kutukNo" class="form-label">Kütük No</label>
+                    <input type="text" class="form-control p-3" id="kutukNo" name="kutuk_no">
+                </div>
+
+                <!-- Başkan Adı ve Telefon Yan Yana -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="baskanAdi" class="form-label">Yetkili Adı</label>
+                            <input type="text" class="form-control p-3" id="baskanAdi" name="baskan_adi">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="telefon" class="form-label">Telefon</label>
+                            <input type="tel" class="form-control p-3" id="telefon" name="telefon">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="eposta" class="form-label">Eposta</label>
+                    <input type="email" class="form-control p-3" id="eposta" name="eposta">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="iban" class="form-label">IBAN</label>
+                    <input type="text" class="form-control p-3" id="iban" name="iban">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="adres" class="form-label">Adres</label>
+                    <textarea class="form-control p-3" id="adres" name="adres" rows="3"></textarea>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="il" class="form-label">İl</label>
+                    <input type="text" class="form-control p-3" id="il" name="il">
+                </div>
+
+                <!-- Kullanıcı Adı ve Şifre Yan Yana -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="kullaniciAdi" class="form-label">Kullanıcı Adı</label>
+                            <input type="text" class="form-control p-3" id="kullaniciAdi" name="kullanici_adi" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="sifre" class="form-label">Şifre</label>
+                            <input type="password" class="form-control p-3" id="sifre" name="sifre" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 p-3 rounded-pill">Ekle</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #4a90e2);
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        border-color: #007bff;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        border-radius: 50px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .alert {
+        border-radius: 12px;
+    }
+
+    /* Mobil cihazlar için responsive tasarım */
+    @media (max-width: 768px) {
+        .row {
+            margin-bottom: 15px;
+        }
+    }
+</style>
+{% endblock %}

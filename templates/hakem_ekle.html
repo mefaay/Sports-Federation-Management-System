@@ -1,0 +1,101 @@
+<!-- hakem_ekle.html -->
+{% extends 'base.html' %}
+
+{% block title %}Hakem Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+<div></div>
+	{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+        <li class="alert alert-{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+    <form method="post" enctype="multipart/form-data">
+        <!-- CSRF Token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+
+        <div class="mb-3">
+            <label for="foto" class="form-label">Fotoğraf</label>
+            <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
+        </div>
+		<div class="mb-3">
+    <label for="kutukNo" class="form-label">Kütük Numarası</label>
+    <input type="text" class="form-control" id="kutukNo" name="kutuk_no" required>
+</div>
+
+        <div class="mb-3">
+            <label for="tcKimlikNo" class="form-label">T.C. Kimlik No</label>
+            <input type="text" class="form-control" id="tcKimlikNo" name="tc_kimlik_no" required pattern="\d{11}" title="11 haneli T.C. Kimlik No giriniz.">
+        </div>
+
+        <div class="mb-3">
+            <label for="adSoyad" class="form-label">Ad Soyad</label>
+            <input type="text" class="form-control" id="adSoyad" name="ad_soyad" required>
+        </div>
+
+<div class="mb-3">
+    <label for="derece" class="form-label">Derece</label>
+    <select class="form-select" id="derece" name="derece" required>
+        <option value="">-- Derece Seçiniz --</option>
+        <option value="Aday Hakem">Aday Hakem</option>
+        <option value="İl Hakemi">İl Hakemi</option>
+        <option value="Ulusal Hakem">Ulusal Hakem</option>
+        <option value="Uluslararası Hakem">Uluslararası Hakem</option>
+    </select>
+</div>
+
+
+        <div class="mb-3">
+            <label for="dogumTarihi" class="form-label">Doğum Tarihi</label>
+            <input type="date" class="form-control" id="dogumTarihi" name="dogum_tarihi">
+        </div>
+
+        <div class="mb-3">
+            <label for="telefon" class="form-label">Telefon</label>
+            <input type="tel" class="form-control" id="telefon" name="telefon">
+        </div>
+
+        <div class="mb-3">
+            <label for="eposta" class="form-label">E-posta</label>
+            <input type="email" class="form-control" id="eposta" name="eposta">
+        </div>
+
+        <div class="mb-3">
+            <label for="iban" class="form-label">IBAN</label>
+            <input type="text" class="form-control" id="iban" name="iban">
+        </div>
+
+        <div class="mb-3">
+            <label for="adres" class="form-label">Adres</label>
+            <textarea class="form-control" id="adres" name="adres" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="hakem_ili" class="form-label">İl</label>
+            <input type="text" class="form-control" id="hakem_ili" name="hakem_ili">
+        </div>
+        <div class="mb-3">
+            <label for="izinAdresi" class="form-label">İzin yeri ve Adresi</label>
+            <textarea class="form-control" id="izinAdresi" name="izin_adresi" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="kullaniciAdi" class="form-label">Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="kullaniciAdi" name="kullanici_adi" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="sifre" class="form-label">Şifre</label>
+            <input type="password" class="form-control" id="sifre" name="sifre" required>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>
+{% endblock %}

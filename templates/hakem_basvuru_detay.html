@@ -1,0 +1,79 @@
+<!-- hakem_basvuru_detay.html -->
+{% extends 'base.html' %}
+
+{% block title %}Hakem Başvuru Detayı{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Hakem Başvuru Detayı</h2>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>ID:</th>
+                <td>{{ hakem_basvuru.id }}</td>
+            </tr>
+<th>Fotoğraf:</th>
+<td>
+    {% if hakem_basvuru.foto %}
+    <img src="{{ url_for('static', filename='adayhakem/' + hakem_basvuru.foto) }}" alt="Fotoğraf" height="200" width="200">
+    {% else %}
+    Fotoğraf yok
+    {% endif %}
+</td>
+
+            <tr>
+                <th>Ad Soyad:</th>
+                <td>{{ hakem_basvuru.ad_soyad }}</td>
+            </tr>
+            <tr>
+                <th>TC Kimlik No:</th>
+                <td>{{ hakem_basvuru.tc_kimlik_no }}</td>
+            </tr>
+            <tr>
+                <th>Doğum Tarihi:</th>
+                <td>{{ hakem_basvuru.dogum_tarihi.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            <tr>
+                <th>Telefon:</th>
+                <td>{{ hakem_basvuru.telefon }}</td>
+            </tr>
+            <tr>
+                <th>Eposta:</th>
+                <td>{{ hakem_basvuru.eposta }}</td>
+            </tr>
+            <tr>
+                <th>IBAN:</th>
+                <td>{{ hakem_basvuru.iban }}</td>
+            </tr>
+            <tr>
+                <th>Adres:</th>
+                <td>{{ hakem_basvuru.adres }}</td>
+            </tr>
+            <tr>
+                <th>İl:</th>
+                <td>{{ hakem_basvuru.il }}</td>
+            </tr>
+            <tr>
+                <th>Kütük No:</th>
+                <td>{{ hakem_basvuru.kutuk_no }}</td>
+            </tr>
+            <tr>
+                <th>İzin Adresi:</th>
+                <td>{{ hakem_basvuru.izin_adresi }}</td>
+            </tr>
+            <tr>
+
+            <tr>
+                <th>Belgeler:</th>
+                <td>
+                    <ul>
+                        {% for belge in hakem_basvuru.belgeler %}
+                        <li>{{ belge.belge_tipi }}: <a href="{{ url_for('static', filename='adayhakem/' + belge.belge_yolu) }}" target="_blank">Görüntüle</a></li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

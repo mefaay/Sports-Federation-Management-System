@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Yönetici Ekle{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>Yönetici Ekle</h2>
+  <form method="POST" action="{{ url_for('yonetici_ekle') }}" enctype="multipart/form-data">
+    
+    <!-- Yönetici Bilgileri -->
+    <div class="form-group">
+      <label for="foto">Fotoğraf</label>
+      <input type="file" class="form-control" id="foto" name="foto">
+    </div>
+	<div class="form-group">
+      <label for="tc_kimlik_no">TC Kimlik No</label>
+      <input type="text" class="form-control" id="tc_kimlik_no" name="tc_kimlik_no" required>
+    </div>	
+    <div class="form-group">
+      <label for="ad_soyad">Ad Soyad</label>
+      <input type="text" class="form-control" id="ad_soyad" name="ad_soyad" required>
+    </div>
+    <div class="form-group">
+      <label for="gorevi">Görevi</label>
+      <input type="text" class="form-control" id="gorevi" name="gorevi" required>
+    </div>
+    <div class="form-group">
+      <label for="telefon">Telefon</label>
+      <input type="tel" class="form-control" id="telefon" name="telefon" required>
+    </div>
+    <div class="form-group">
+      <label for="eposta">Eposta</label>
+      <input type="email" class="form-control" id="eposta" name="eposta" required>
+    </div>
+    <div class="form-group">
+      <label for="adres">Adres</label>
+      <textarea class="form-control" id="adres" name="adres" required></textarea>
+    </div>
+    <div class="form-group">
+      <label for="il">İl</label>
+      <input type="text" class="form-control" id="il" name="il" required>
+    </div>
+    <!-- Kullanıcı Bilgileri -->
+    <div class="form-group">
+      <label for="kullanici_adi">Kullanıcı Adı</label>
+      <input type="text" class="form-control" id="kullanici_adi" name="kullanici_adi" required>
+    </div>
+    <div class="form-group">
+      <label for="sifre">Şifre</label>
+      <input type="password" class="form-control" id="sifre" name="sifre" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Yönetici Ekle</button>
+  </form>
+</div>
+{% endblock %}

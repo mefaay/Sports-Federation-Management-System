@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Duyuru Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Duyuru Ekle</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="baslik" class="form-label">Başlık</label>
+            <input type="text" class="form-control" id="baslik" name="baslik" required>
+        </div>
+        <div class="mb-3">
+            <label for="icerik" class="form-label">İçerik</label>
+            <textarea class="form-control" id="icerik" name="icerik" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yönetim Paneli{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <!-- Yazar Bilgileri -->
+    <meta name="author" content="Mehmet Faruk AYDIN">
+    <meta name="publisher" content="Mefaay Technology">
+    <!-- Custom Scripts -->
+    {% block scripts %}{% endblock %}
+</head>
+<body>
+{% macro csrf_input() %}
+  {% if csrf_token %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  {% endif %}
+{% endmacro %}
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#">{{ title }}</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Kullanım Talimatı <i class="fas fa-info-circle"></i></a>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('hakkinda') }}">Hakkında <i class="fas fa-address-card"></i></a>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="sendWhatsAppMessage()">Destek <i class="fas fa-headset"></i></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto">
+        <li class="divider-vertical"></li>
+        {% if session['role'] == 'Kulup' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('kulup_listesi') }}">Kulüp Profili <i class="fas fa-building"></i></a>
+        </li>
+        <li class="divider-vertical"></li>
+        {% endif %}
+        {% if session['role'] == 'Antrenor' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('antrenor_listesi') }}">Antrenör Profili <i class="fas fa-chalkboard-teacher"></i></a>
+        </li>
+        <li class="divider-vertical"></li>
+        {% endif %}
+        {% if session['role'] == 'Hakem' %}
+        {% set mhk_uyesi = is_mhk_member(session['user_id']) %}
+        {% if not mhk_uyesi %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('hakem_listesi') }}">Hakem Profili <i class="fas fa-gavel"></i></a>
+        </li>
+        <li class="divider-vertical"></li>
+        {% endif %}
+        {% endif %}
+        {% if session['role'] == 'IlTemsilcisi' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('il_temsilcileri_listesi') }}">İl Temsilcisi Profili <i class="fas fa-user-tie"></i></a>
+        </li>
+        <li class="divider-vertical"></li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('logout') }}">Çıkış <i class="fas fa-sign-out-alt"></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Sidebar and Content -->
+<div class="d-flex">
+  <div class="bg-dark text-white sidebar collapse d-lg-block" id="sidebarMenu">
+    <div class="text-center my-3 d-none d-lg-block">
+      <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Logo" class="img-fluid logo my-3">
+      <h5>Federasyon Yönetim <br>Sistemi</h5>
+    </div>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{{ url_for('dashboard') }}" class="nav-link text-white" aria-current="page">
+          <i class="fas fa-tachometer-alt"></i> Anasayfa
+        </a>
+      </li>
+      {% if session['role'] == 'Yonetici' %}
+      <li class="nav-item">
+        <a href="{{ url_for('yonetici_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-users-cog"></i> Yöneticiler
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('kullanici_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-users"></i> Kullanıcılar
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] %}
+      <li class="nav-item">
+        <a href="{{ url_for('kulup_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-building"></i>
+          {% if session['role'] == 'Kulup' %}
+            Kulüp Profili
+          {% elif session['role'] == 'Antrenor' %}
+            Kulüp Bilgisi
+          {% else %}
+            Kulüpler
+          {% endif %}
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi', 'Antrenor'] %}
+      <li class="nav-item">
+        <a href="{{ url_for('sporcu_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-running"></i> Sporcular
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Kulup', 'Yonetici'] %}
+      <li class="nav-item">
+        <a href="{{ url_for('antrenor_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-chalkboard-teacher"></i> Antrenörler
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] == 'Yonetici' %}
+      <li class="nav-item">
+        <a href="{{ url_for('il_temsilcileri_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-user-tie"></i> İl Temsilcileri
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('hakem_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-gavel"></i> Hakemler
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('hakem_basvuru_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-list-alt"></i> Hakem Başvuru
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('musabaka_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-clipboard-list"></i> Müsabaka Yönetimi
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('gorevlendirme_talepleri') }}" class="nav-link text-white">
+          <i class="fas fa-user-check"></i> Görevlendirme Talepleri
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+      {% if show_details_management %}
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-cogs"></i> Ayrıntı Yönetimi
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenu">
+          <li><a class="dropdown-item" href="{{ url_for('spor_dallari_ve_sonuc_turleri_listele') }}">S.Dal ve Sonuç Türü</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('brans_listesi') }}">Branş Listesi</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('yas_kategori_listesi') }}">Yaş Kategorileri</a></li>
+        </ul>
+      </li>
+      {% endif %}
+      {% endif %}
+      {% if session['role'] == 'Hakem' %}
+      <li class="nav-item">
+        <a href="{{ url_for('hakem_gorev_talep_et') }}" class="nav-link text-white">
+          <i class="fas fa-hand-paper"></i> Görev Talep Et
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('hakem_talep_durumu') }}" class="nav-link text-white">
+          <i class="fas fa-hourglass-half"></i> Talep Durumu
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('hakem_gorev_alinan_musabakalar') }}" class="nav-link text-white">
+          <i class="fas fa-trophy"></i> Görev Alınan Müsabakalar
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['IlTemsilcisi', 'Yonetici', 'Kulup', 'Antrenor'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('musabaka_katilim') }}" class="nav-link text-white">
+          <i class="fa fa-user-check"></i> Müsabaka Katılım
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('start_listesi') }}" class="nav-link text-white">
+          <i class="fas fa-file-export"></i> Start Listesi İndir
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['IlTemsilcisi', 'Kulup', 'Antrenor'] or is_mhk_member(session['user_id']) %}
+      <li class="nav-item">
+        <a href="{{ url_for('tum_musabakalar') }}" class="nav-link text-white" target="_blank">
+          <i class="fas fa-list"></i> S.Listesi ve Sonuçlar
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['IlTemsilcisi', 'Yonetici', 'Kulup', 'Antrenor', 'Hakem'] %}
+      <li class="nav-item">
+        <a href="{{ url_for('duyurular') }}" class="nav-link text-white">
+          <i class="fas fa-bullhorn"></i> Duyurular
+        </a>
+      </li>
+      {% endif %}
+      {% if session['role'] in ['Yonetici'] %}
+      <li class="nav-item">
+        <a href="{{ url_for('online_kullanicilar') }}" class="nav-link text-white">
+          <i class="fas fa-user-circle"></i> Online Kullanıcılar
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+  
+  <div class="flex-grow-1 p-3 bg-light" id="content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center p-3 mt-auto">
+  &copy; 2024 Mefaay Technology FyS v13 Tüm hakları saklıdır.
+</footer>
+
+<!-- Flash Mesajları için Modal -->
+<div class="modal fade" id="flashMessageModal" tabindex="-1" aria-labelledby="flashMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="flashMessageModalLabel">Uyarı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flash Mesajı Var İse Modalı Göstermek İçin JavaScript -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                $('#flashMessageModal').modal('show');
+            {% endif %}
+        {% endwith %}
+    });
+</script>
+
+<script>
+    function sendWhatsAppMessage() {
+        var phoneNumber = "+908503464657"; // WhatsApp numarasını değiştirin
+        var message = "MYS sistemi için yardıma ihtiyacım var";
+        var whatsappURL = "https://api.whatsapp.com/send?phone=" + encodeURIComponent(phoneNumber) + "&text=" + encodeURIComponent(message);
+        window.open(whatsappURL);
+    }
+</script>
+
+<!-- Bootstrap JS ve diğer JS scriptleri -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

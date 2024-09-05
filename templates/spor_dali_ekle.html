@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Spor Dalı Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Spor Dalı Ekle</h2>
+    <form action="{{ url_for('spor_dali_ekle') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+        
+        <div class="form-group">
+            <label for="sporDaliAdi">Spor Dalı Adı:</label>
+            <input type="text" class="form-control" id="sporDaliAdi" name="spor_dali_adi" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>
+{% endblock %}

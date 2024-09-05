@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanıcı Güncelle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white rounded-top">
+            <h3 class="mb-0">Kullanıcı Güncelle</h3>
+        </div>
+        <div class="card-body p-5">
+            <form action="{{ url_for('kullanici_guncelle', id=kullanici.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+
+                <!-- Rol Gösterimi -->
+                {% if session['role'] == 'Yonetici' %}
+                    <div class="form-group mb-4">
+                        <label class="form-label">Rol</label>
+                        <input type="text" class="form-control p-3" value="{{ kullanici.rol.name }}" readonly>
+                    </div>
+                {% endif %}
+
+                <!-- İlgili İsim -->
+                <div class="form-group mb-4">
+                    {% if session['role'] == 'Kulup' and ilgili_isim_tipi != 'Kisi' %}
+                        <label class="form-label">Kulüp Adı</label>
+                    {% else %}
+                        <label class="form-label">İsim Soyisim</label>
+                    {% endif %}
+                    <input type="text" class="form-control p-3" value="{{ ilgili_isim }}" readonly>
+                </div>
+
+                <!-- Kullanıcı Adı Güncelleme -->
+                <div class="form-group mb-4">
+                    <label for="kullaniciAdi" class="form-label">Kullanıcı Adı</label>
+                    <input type="text" class="form-control p-3" id="kullaniciAdi" name="kullanici_adi" value="{{ kullanici.kullanici_adi }}" required>
+                </div>
+
+                <!-- Şifre Güncelleme -->
+                <div class="form-group mb-4">
+                    <label for="sifre" class="form-label">Yeni Şifre</label>
+                    <input type="password" class="form-control p-3" id="sifre" name="yeni_sifre">
+                </div>
+
+                <button type="submit" class="btn btn-dark w-10 w-100 p-3 rounded-pill">Güncelle</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background-color: #007bff; /* Mavi renkli tepe kısmı */
+    }
+
+    .form-control {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}

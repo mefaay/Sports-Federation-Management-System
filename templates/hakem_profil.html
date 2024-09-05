@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Hakem Profili{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h2>Hakem Bilgileri</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Hakem Fotoğrafı -->
+                    <img src="{{ url_for('static', filename='uploads/' + hakem.foto) }}" alt="{{ hakem.ad_soyad }}" class="img-thumbnail">
+                </div>
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Ad Soyad</th>
+                                <td>{{ hakem.ad_soyad }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">TC No</th>
+                                <td>{{ hakem.tc_kimlik_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Kütük No</th>
+                                <td>{{ hakem.kutuk_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Derece</th>
+                                <td>{{ hakem.derece }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Telefon</th>
+                                <td>{{ hakem.telefon }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Doğum Tarihi</th>
+                                <td>{{ hakem.dogum_tarihi.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Eposta</th>
+                                <td>{{ hakem.eposta }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Adres</th>
+                                <td>{{ hakem.adres }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">İl</th>
+                                <td>{{ hakem.il }}</td>
+                            </tr>
+                            <!-- Diğer hakem bilgileri -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

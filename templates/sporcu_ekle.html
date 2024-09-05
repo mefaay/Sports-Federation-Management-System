@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block title %}Sporcu Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white rounded-top">
+            <h3 class="mb-0">Sporcu Ekle</h3>
+        </div>
+        <div class="card-body p-5">
+            <form method="post" enctype="multipart/form-data">
+                {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="foto" class="form-label">Fotoğraf:</label>
+                            <input type="file" name="foto" id="foto" class="form-control p-2">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="ad_soyad" class="form-label">Ad Soyad:</label>
+                            <input type="text" class="form-control p-3" name="ad_soyad" id="ad_soyad" placeholder="Adınızı ve Soyadınızı Giriniz" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="tc_no" class="form-label">TC No:</label>
+                            <input type="text" class="form-control p-3" name="tc_no" id="tc_no" pattern="\d{11}" maxlength="11" title="TC No 11 haneli olmalıdır." placeholder="11 Haneli TC No" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="dogum_tarihi" class="form-label">Doğum Tarihi:</label>
+                            <input type="date" class="form-control p-3" name="dogum_tarihi" id="dogum_tarihi" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="lisans_no" class="form-label">Lisans No:</label>
+                            <input type="text" class="form-control p-3" name="lisans_no" id="lisans_no" placeholder="Lisans Numarası">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="cinsiyet" class="form-label">Cinsiyet:</label>
+                            <select class="form-select p-3" name="cinsiyet" id="cinsiyet" required>
+                                <option value="">Seçiniz...</option>
+                                <option value="Erkek">Erkek</option>
+                                <option value="Kadın">Kadın</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="adres" class="form-label">Adres:</label>
+                    <textarea class="form-control p-3" name="adres" id="adres" rows="3" placeholder="Adresinizi Giriniz"></textarea>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="telefon" class="form-label">Telefon:</label>
+                    <input type="tel" class="form-control p-3" name="telefon" id="telefon" placeholder="Telefon Numaranız">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="il" class="form-label">İl:</label>
+                    <select class="form-select p-3" name="il" id="il" required {% if session['role'] == 'IlTemsilcisi' %}disabled{% endif %}>
+                        <option value="">Lütfen bir il seçiniz</option>
+        <option value="Adana">Adana</option>
+        <option value="Adıyaman">Adıyaman</option>
+        <option value="Afyonkarahisar">Afyonkarahisar</option>
+        <option value="Ağrı">Ağrı</option>
+        <option value="Amasya">Amasya</option>
+        <option value="Ankara">Ankara</option>
+        <option value="Antalya">Antalya</option>
+        <option value="Artvin">Artvin</option>
+        <option value="Aydın">Aydın</option>
+        <option value="Balıkesir">Balıkesir</option>
+        <option value="Bilecik">Bilecik</option>
+        <option value="Bingöl">Bingöl</option>
+        <option value="Bitlis">Bitlis</option>
+        <option value="Bolu">Bolu</option>
+        <option value="Burdur">Burdur</option>
+        <option value="Bursa">Bursa</option>
+        <option value="Çanakkale">Çanakkale</option>
+        <option value="Çankırı">Çankırı</option>
+        <option value="Çorum">Çorum</option>
+        <option value="Denizli">Denizli</option>
+        <option value="Diyarbakır">Diyarbakır</option>
+        <option value="Edirne">Edirne</option>
+        <option value="Elazığ">Elazığ</option>
+        <option value="Erzincan">Erzincan</option>
+        <option value="Erzurum">Erzurum</option>
+        <option value="Eskişehir">Eskişehir</option>
+        <option value="Gaziantep">Gaziantep</option>
+        <option value="Giresun">Giresun</option>
+        <option value="Gümüşhane">Gümüşhane</option>
+        <option value="Hakkâri">Hakkâri</option>
+        <option value="Hatay">Hatay</option>
+        <option value="Isparta">Isparta</option>
+        <option value="Mersin">Mersin</option>
+        <option value="İstanbul">İstanbul</option>
+        <option value="İzmir">İzmir</option>
+        <option value="Kars">Kars</option>
+        <option value="Kastamonu">Kastamonu</option>
+        <option value="Kayseri">Kayseri</option>
+        <option value="Kırklareli">Kırklareli</option>
+        <option value="Kırşehir">Kırşehir</option>
+        <option value="Kocaeli">Kocaeli</option>
+        <option value="Konya">Konya</option>
+        <option value="Kütahya">Kütahya</option>
+        <option value="Malatya">Malatya</option>
+        <option value="Manisa">Manisa</option>
+        <option value="Kahramanmaraş">Kahramanmaraş</option>
+        <option value="Mardin">Mardin</option>
+        <option value="Muğla">Muğla</option>
+        <option value="Muş">Muş</option>
+        <option value="Nevşehir">Nevşehir</option>
+        <option value="Niğde">Niğde</option>
+        <option value="Ordu">Ordu</option>
+        <option value="Rize">Rize</option>
+        <option value="Sakarya">Sakarya</option>
+        <option value="Samsun">Samsun</option>
+        <option value="Siirt">Siirt</option>
+        <option value="Sinop">Sinop</option>
+        <option value="Sivas">Sivas</option>
+        <option value="Tekirdağ">Tekirdağ</option>
+        <option value="Tokat">Tokat</option>
+        <option value="Trabzon">Trabzon</option>
+        <option value="Tunceli">Tunceli</option>
+        <option value="Şanlıurfa">Şanlıurfa</option>
+        <option value="Uşak">Uşak</option>
+        <option value="Van">Van</option>
+        <option value="Yozgat">Yozgat</option>
+        <option value="Zonguldak">Zonguldak</option>
+        <option value="Aksaray">Aksaray</option>
+        <option value="Bayburt">Bayburt</option>
+        <option value="Karaman">Karaman</option>
+        <option value="Kırıkkale">Kırıkkale</option>
+        <option value="Batman">Batman</option>
+        <option value="Şırnak">Şırnak</option>
+        <option value="Bartın">Bartın</option>
+        <option value="Ardahan">Ardahan</option>
+        <option value="Iğdır">Iğdır</option>
+        <option value="Yalova">Yalova</option>
+        <option value="Karabük">Karabük</option>
+        <option value="Kilis">Kilis</option>
+        <option value="Osmaniye">Osmaniye</option>
+        <option value="Düzce">Düzce</option>
+                   </select>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label>Sporcu Tipi:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sporcu_tipi" id="kulup_sporcusu" value="kulup">
+                        <label class="form-check-label" for="kulup_sporcusu">Kulüp Sporcusu</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sporcu_tipi" id="ferdi_sporcu" value="ferdi">
+                        <label class="form-check-label" for="ferdi_sporcu">Ferdi Sporcu</label>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4 d-none" id="kulupSecim">
+                    <label for="kulup_id" class="form-label">Kulüp:</label>
+                    <select class="form-select p-3" name="kulup_id" id="kulup_id">
+                        <option value="">Seçiniz...</option>
+        {% for kulup in kulupler %}
+        <option value="{{ kulup.id }}">{{ kulup.kulup_adi }}</option>
+        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mb-4 d-none" id="ilTemsilcisiSecim">
+                    <label for="il_temsilcisi_id" class="form-label">İl Temsilcisi:</label>
+                    <select class="form-select p-3" name="il_temsilcisi_id" id="il_temsilcisi_id">
+                        <option value="">Seçiniz...</option>
+        {% for temsilci in il_temsilcileri %}
+        <option value="{{ temsilci.il }}">{{ temsilci.il }} Temsilciliği </option>
+        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 p-3 rounded-pill">Ekle</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+    var userRole = "{{ user_role }}";
+    var kulupId = "{{ kulup_id_session }}";
+    var ilTemsilcisiIl = "{{ il_temsilcisi_il }}";
+
+    var kulupSporcusuRadio = document.getElementById('kulup_sporcusu');
+    var ferdiSporcuRadio = document.getElementById('ferdi_sporcu');
+    var kulupSecim = document.getElementById('kulupSecim');
+    var ilTemsilcisiSecim = document.getElementById('ilTemsilcisiSecim');
+    var kulupSelect = document.getElementById('kulup_id');
+    var ilTemsilcisiSelect = document.getElementById('il_temsilcisi_id');
+    var ilSelect = document.getElementById('il');
+    var hiddenIlInput = document.getElementById('hidden_il'); // Gizli il alanını seç
+
+    // Sporcu tipi seçimine göre göster/gizle işlevi
+    function toggleSelection() {
+        if (kulupSporcusuRadio.checked) {
+            kulupSecim.classList.remove('d-none');
+            ilTemsilcisiSecim.classList.add('d-none');
+            ilSelect.value = '{{ kulup_il }}'; // Kulüp seçildiğinde ilSelect alanına kulübün ilini otomatik olarak seç
+            updateHiddenIlField(ilSelect.value); // Gizli il alanını güncelle
+        } else if (ferdiSporcuRadio.checked) {
+            kulupSecim.classList.add('d-none');
+            ilTemsilcisiSecim.classList.remove('d-none');
+            ilSelect.value = ilTemsilcisiIl; // İl temsilcisi seçildiğinde ilSelect alanına il temsilciliğinin ilini otomatik olarak seç
+            updateHiddenIlField(ilSelect.value); // Gizli il alanını güncelle
+        }
+    }
+
+    // Gizli il alanını güncelleme fonksiyonu
+    function updateHiddenIlField(value) {
+        hiddenIlInput.value = value;
+    }
+
+    // Kullanıcı rolüne göre ayarlamalar yap
+    if (userRole === 'Kulup') {
+        kulupSporcusuRadio.checked = true;
+        ferdiSporcuRadio.disabled = true;
+        kulupSecim.classList.remove('d-none');
+        ilTemsilcisiSecim.classList.add('d-none');
+        kulupSelect.value = kulupId;
+        kulupSelect.disabled = true;
+        ilSelect.value = '{{ kulup_il }}'; // Kulüp seçildiğinde ilSelect alanına kulübün ilini otomatik olarak seç
+        updateHiddenIlField(ilSelect.value); // Gizli il alanını güncelle
+    } else if (userRole === 'IlTemsilcisi') {
+        ferdiSporcuRadio.checked = true;
+        kulupSporcusuRadio.disabled = true;
+        kulupSecim.classList.add('d-none');
+        ilTemsilcisiSecim.classList.remove('d-none');
+        ilTemsilcisiSelect.value = ilTemsilcisiIl;
+        ilTemsilcisiSelect.disabled = true;
+        ilSelect.value = ilTemsilcisiIl; // İl temsilcisi seçildiğinde ilSelect alanına il temsilciliğinin ilini otomatik olarak seç
+        updateHiddenIlField(ilSelect.value); // Gizli il alanını güncelle
+    }
+
+    // Yönetici için sporcu tipi seçimine bağlı seçenekler dinamik olarak güncellenir
+    if (userRole === 'Yonetici') {
+        document.querySelectorAll('input[name="sporcu_tipi"]').forEach(function(radio) {
+            radio.addEventListener('change', toggleSelection);
+        });
+        toggleSelection(); // İlk yükleme için ayarları yap
+    }
+
+    // İl seçiminde gizli alanı güncelle
+    ilSelect.addEventListener('change', function() {
+        updateHiddenIlField(ilSelect.value);
+    });
+});
+
+</script>
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #4a90e2, #007bff);
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-dark {
+        background: linear-gradient(135deg, #343a40, #000);
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: linear-gradient(135deg, #000, #343a40);
+    }
+</style>
+
+{% endblock %}
+
+
+

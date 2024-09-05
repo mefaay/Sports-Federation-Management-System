@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Duyuru Detay{% endblock %}
+
+{% block content %}
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white rounded-top">
+            <h3 class="card-title mb-0">{{ duyuru.baslik }}</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="duyuru-icerik" style="white-space: pre-line; font-size: 1.1rem; line-height: 1.6;">
+                {{ duyuru.icerik | safe }}
+            </div>
+            <p class="text-muted mt-4">
+                <i class="far fa-calendar-alt me-2"></i>Yayınlanma Tarihi: {{ duyuru.yayinlanma_tarihi.strftime('%d/%m/%Y %H:%M') }}<br>
+                <i class="far fa-user me-2"></i>Yazar: {{ yazar_ad_soyad }}
+            </p>
+        </div>
+        <div class="card-footer bg-light text-right">
+            <a href="{{ url_for('duyurular') }}" class="btn btn-secondary btn-sm">Geri Dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .container {
+        max-width: 800px;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #4a90e2);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .card-title {
+        font-size: 1.75rem;
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+
+    .card-body {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .btn-secondary {
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .card-footer {
+        border-radius: 0 0 20px 20px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 15px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-footer {
+            padding: 10px 20px;
+        }
+    }
+</style>
+{% endblock %}

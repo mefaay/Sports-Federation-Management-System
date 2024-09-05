@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}İl Temsilcisi Detayı{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-body">
+                <!-- İl Temsilcisi Bilgileri Başlığı ve Düzenle Butonu -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>İl Temsilcisi Bilgileri</h2>
+                    <a href="{{ url_for('il_temsilcisi_duzenle', id=il_temsilcisi.id) }}" class="btn btn-warning">Bilgileri Düzenle</a>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <!-- İl Temsilcisi Fotoğrafı -->
+                    {% if il_temsilcisi.foto %}
+                        <img src="{{ url_for('static', filename='uploads/' + il_temsilcisi.foto) }}" alt="{{ il_temsilcisi.ad_soyad }}" class="img-thumbnail">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='placeholder.jpg') }}" alt="No image available" class="img-thumbnail">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Ad Soyad</th>
+                                <td>{{ il_temsilcisi.ad_soyad }}</td>
+                            </tr>
+							<tr>
+                                <th scope="row">T.C. Kimlik No</th>
+                                <td>{{ il_temsilcisi.tc_kimlik_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Eposta</th>
+                                <td>{{ il_temsilcisi.eposta }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Telefon</th>
+                                <td>{{ il_temsilcisi.telefon }}</td>
+                            </tr>
+							<tr>
+                                <th scope="row">Adres</th>
+                                <td>{{ il_temsilcisi.adres }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Görevli Olduğu İl</th>
+                                <td>{{ il_temsilcisi.il }}</td>
+                            </tr>
+                            <!-- Diğer il temsilcisi bilgileri -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detaylar Sekmeleri -->
+    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="sporcular-tab" data-bs-toggle="tab" data-bs-target="#sporcular" type="button" role="tab" aria-controls="sporcular" aria-selected="true">Sporcular</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="musabakalar-tab" data-bs-toggle="tab" data-bs-target="#musabakalar" type="button" role="tab" aria-controls="musabakalar" aria-selected="false">Müsabakalar</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <!-- Sporcular Sekmesi -->
+        <div class="tab-pane fade show active" id="sporcular" role="tabpanel" aria-labelledby="sporcular-tab">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Foto</th>
+                        <th scope="col">Ad Soyad</th>
+                        <th scope="col">TC No</th>
+                        <th scope="col">Lisans No</th>
+						<th scope="col">Cinsiyeto</th>
+						<th scope="col">Doğum Tarihi</th>
+                        <!-- Diğer başlıklar -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sporcu in sporcular %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>
+                            {% if sporcu.foto %}
+                                <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="{{ sporcu.ad_soyad }}" height="50">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='placeholder.jpg') }}" alt="No image available" height="50">
+                            {% endif %}
+                        </td>
+                        <td>{{ sporcu.ad_soyad }}</td>
+                        <td>{{ sporcu.tc_no }}</td>
+                        <td>{{ sporcu.lisans_no }}</td>
+						<td>{{ sporcu.cinsiyet }}</td>
+						<td>{{ sporcu.dogum_tarihi.strftime('%d/%m/%Y') }}</td>
+                        <!-- Diğer sporcu bilgileri -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+<!-- Müsabakalar Sekmesi -->
+<div class="tab-pane fade" id="musabakalar" role="tabpanel" aria-labelledby="musabakalar-tab">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Müsabaka Adı</th>
+                <th scope="col">Başlama Tarihi</th>
+                <th scope="col">Bitiş Tarihi</th>
+                <th scope="col">Katılan Sporcular</th>
+                <!-- Diğer müsabaka başlıkları -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for musabaka in musabakalar %}
+            <tr>
+                <td>{{ musabaka.musabaka_adi }}</td>
+                <td>{{ musabaka.baslama_tarihi.strftime('%d/%m/%Y') if musabaka.baslama_tarihi else 'Bilinmiyor' }}</td>
+                <td>{{ musabaka.bitis_tarihi.strftime('%d/%m/%Y') if musabaka.bitis_tarihi else 'Bilinmiyor' }}</td>
+                <td>
+                    {% for sporcu in musabaka.katilan_sporcular %}
+                        {{ sporcu.ad_soyad }}
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <!-- Diğer müsabaka bilgileri -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    </div>
+</div>
+</div>
+{% endblock %}

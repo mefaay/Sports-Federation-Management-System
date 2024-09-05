@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h2>Müsabaka Sonuç Girişi - Müsabaka ID: {{ musabaka_id }}</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sporcu Adı</th>
+                    <th>Detaylar</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sporcu in sporcular %}
+                <tr>
+                    <td>{{ sporcu.ad_soyad }}</td>
+                    <td>{{ sporcu.detaylar }}</td>
+                    <td>
+                        <a href="{{ url_for('sonuc_girisi_formu', musabaka_id=musabaka_id, sporcu_id=sporcu.id) }}" class="btn btn-primary">Sonuç Gir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

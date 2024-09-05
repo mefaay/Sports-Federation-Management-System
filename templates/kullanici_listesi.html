@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanıcı Listesi{% endblock %}
+
+{% block content %}
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Kullanıcı Listesi</h3>
+            <input type="text" id="searchInput" class="form-control" placeholder="Kullanıcı Ara" onkeyup="searchTable()" style="max-width: 300px;">
+        </div>
+        <div class="card-body">
+            <!-- Arama sonuç sayısını göster -->
+            <div id="searchResultCount" class="mb-2"></div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Rol</th>
+                            <th>İlgili İsim</th>
+                            <th>Kullanıcı Adı</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kullanici, kulup_adi, iltemsilcisi_ad_soyad, antrenor_ad_soyad, hakem_ad_soyad, yonetici_ad_soyad in kullanicilar %}
+                        <tr>
+                            <td>{{ kullanici.id }}</td>
+                            <td>{{ kullanici.rol.name }}</td>
+                            <td>{{ kulup_adi or iltemsilcisi_ad_soyad or antrenor_ad_soyad or hakem_ad_soyad or yonetici_ad_soyad or 'N/A' }}</td>
+                            <td>{{ kullanici.kullanici_adi }}</td>
+                            <td>
+                                <form action="{{ url_for('toggle_user_status', id=kullanici.id) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <button type="submit" class="btn btn-sm {{ 'btn-success' if kullanici.aktif else 'btn-secondary' }}">
+                                        {{ 'Aktif' if kullanici.aktif else 'Pasif' }}
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+<a href="{{ url_for('kullanici_guncelle', id=kullanici.id) }}" class="btn btn-sm" style="background-color: #007bff; border: none; color: white;">Güncelle</a>
+                                <form action="{{ url_for('kullanici_sil', id=kullanici.id) }}" method="post" style="display: inline-block;" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function normalizeText(text) {
+    return text.toLowerCase()
+        .replace(/ç/g, 'c')
+        .replace(/ğ/g, 'g')
+        .replace(/ı/g, 'i')
+        .replace(/ö/g, 'o')
+        .replace(/ş/g, 's')
+        .replace(/ü/g, 'u')
+        .replace(/İ/g, 'i')
+        .replace(/Ğ/g, 'g')
+        .replace(/Ö/g, 'o')
+        .replace(/Ş/g, 's')
+        .replace(/Ü/g, 'u')
+        .replace(/Ç/g, 'c');
+}
+
+function searchTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    var resultCount = 0;
+
+    input = document.getElementById("searchInput");
+    filter = normalizeText(input.value);
+    table = document.getElementsByTagName("table")[0];
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        if (td) {
+            var foundInRow = false;
+            for (var j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = normalizeText(td[j].textContent || td[j].innerText);
+                    if (txtValue.indexOf(filter) > -1) {
+                        foundInRow = true;
+                        break;
+                    }
+                }
+            }
+            if (foundInRow) {
+                tr[i].style.display = "";
+                resultCount++;
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+
+    document.getElementById("searchResultCount").innerText = resultCount + " sonuç bulundu";
+}
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+    .card {
+        border-radius: 15px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #4a90e2);
+        color: white;
+    }
+
+    .form-control {
+        border-radius: 30px;
+        padding: 0.75rem 1.25rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        border-color: #007bff;
+    }
+
+    .btn-sm {
+        border-radius: 20px;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .thead-dark th {
+        background-color: #343a40;
+        color: white;
+        border-top: none;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .form-control {
+            margin-top: 10px;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}

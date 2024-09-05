@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Yönetici Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+<div class="table-responsive"></div>
+
+    <!-- Kartlar -->
+    <div class="row">
+        <div class="col-md-2">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Kulüpler</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ kulup_sayisi }}</h5>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Antrenörler</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ antrenor_sayisi }}</h5>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Sporcular</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ sporcu_sayisi }}</h5>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Hakemler</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ hakem_sayisi }}</h5>
+                </div>
+            </div>
+        </div>
+		<div class="col-md-2">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Kullanıcılar</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ kullanici_sayisi }}</h5>
+                </div>
+            </div>
+        </div>
+		<div class="col-md-2">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Müsabaka Sayısı</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ musabaka_sayisi }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <div class="row">
+    <div class="col-md-12">
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+                <tr>
+                    <th>Son Kulüpler</th>
+                    <th>Son Antrenörler</th>
+
+                    <th>Son Hakemler</th>
+                    <th>Son Kullanıcılar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(son_kulupler|length) %}
+                <tr>
+                    <td>{{ son_kulupler[i].kulup_adi|kisalt if son_kulupler[i] else '' }}</td>
+                    <td>{{ son_antrenorler[i].ad_soyad if son_antrenorler[i] else '' }}</td>
+                    <td>{{ son_hakemler[i].ad_soyad if son_hakemler[i] else '' }}</td>
+                    <td>{{ son_kullanicilar[i].rol }} - {{ son_kullanicilar[i].kullanici_adi if son_kullanicilar[i] else '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div></div>
+<!-- Son Sporcular Listesi -->
+<div class="row">
+    <div class="col-md-12">
+        <h4>Son Sporcular</h4>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+                <tr>
+                    <th>Fotoğraf</th>
+                    <th>TC Kimlik No</th>
+                    <th>Lisans No</th>
+                    <th>Adı Soyadı</th>
+					<th>Doğum Tarihi</th>
+                    <th>Cinsiyeti</th>
+                    <th>Kulübü/İli</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sporcu in son_sporcular %}
+                <tr>
+<td>
+    {% if sporcu.foto %}
+        <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="{{ sporcu.ad_soyad }}" style="height: 60px; width: 50px;">
+    {% else %}
+        <!-- Fotoğraf yoksa gösterilecek alternatif içerik -->
+        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Yedek Fotoğraf" style="height: 60px; width: 50px;">
+    {% endif %}
+</td>                    <td>{{ sporcu.tc_no }}</td>
+                    <td>{{ sporcu.lisans_no }}</td>
+                    <td>{{ sporcu.ad_soyad }}</td>
+					<td>{{ sporcu.dogum_tarihi.strftime('%d-%m-%y') }}</td>
+                    <td>{{ sporcu.cinsiyet }}</td>
+ <td>
+        {% if sporcu.kulup %}
+            {{ sporcu.kulup.kulup_adi }}
+        {% elif sporcu.il_temsilcisi %}
+            {{ sporcu.il_temsilcisi.il }} - Ferdi Sporcu
+        {% else %}
+            Bilinmiyor
+        {% endif %}
+    </td>                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div></div>
+<!-- Yaklaşan Müsabakalar -->
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <center><h4 class="m-0 font-weight-bold">Yaklaşan Müsabakalar</h4></center>
+            </div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+                    <thead>
+                        <tr>
+                            <th>Müsabaka Adı</th>
+                            <th>Disiplin</th>
+                            <th>Başlama ve Bitiş Tarihi</th>
+                            <th>Kayıt Başlama ve Bitiş Tarihi</th>
+                            <th>Konum</th>
+                            <!-- Diğer sütunlar -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for musabaka in yaklasan_musabakalar %}
+                        <tr>
+                            <td>{{ musabaka.musabaka_adi }}</td>
+                            <td>
+							 <!-- Disipline göre dinamik ikon yolu -->
+                                <img src="{{ url_for('static', filename='images/' + musabaka.brans.brans_adi|lower + '.png') }}" alt="{{ musabaka.brans.brans_adi }}" style="height: 30px;">
+							{{ musabaka.brans.brans_adi }}
+							</td>
+                            <td class="text-primary">{{ musabaka.baslama_tarihi.strftime('%d-%m-%Y') }} - {{ musabaka.bitis_tarihi.strftime('%d-%m-%Y') }}</td>
+                            <td class="text-danger">{{ musabaka.katilimci_ekleme_baslangic_tarihi.strftime('%d-%m-%Y') }} - {{ musabaka.katilimci_ekleme_bitis_tarihi.strftime('%d-%m-%Y') }}</td>
+                            <td>{{ musabaka.il }}</td>
+                            <!-- Diğer bilgiler -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

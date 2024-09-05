@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Müsabaka Ekle{% endblock %}
+
+{% block content %}
+<style>
+/* Genel sayfa stili */
+body {
+    background-color: #f7f9fc;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Form genel stili */
+form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Form başlıkları */
+.form-label {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Giriş alanları stili */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+}
+
+/* Buton stili */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 50px;
+    font-size: 1rem;
+    padding: 0.75rem;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 86, 179, 0.4);
+}
+
+/* Mobil uyumlu düzen */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        font-size: 1.1rem;
+    }
+}
+
+</style>
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Müsabaka Ekle</h2>
+    <form method="post" class="bg-white p-4 shadow-sm rounded">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+        <div class="form-group mb-3">
+            <label for="musabaka_adi" class="form-label">Müsabaka Adı:</label>
+            <input type="text" class="form-control" id="musabaka_adi" name="musabaka_adi" required>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-group mb-3">
+                <label for="baslama_tarihi" class="form-label">Başlama Tarihi:</label>
+                <input type="date" class="form-control" id="baslama_tarihi" name="baslama_tarihi" required>
+            </div>
+            <div class="col-md-6 form-group mb-3">
+                <label for="bitis_tarihi" class="form-label">Bitiş Tarihi:</label>
+                <input type="date" class="form-control" id="bitis_tarihi" name="bitis_tarihi" required>
+            </div>
+        </div>
+        <div class="form-group mb-3">
+            <label for="il" class="form-label">İl:</label>
+            <input type="text" class="form-control" id="il" name="il" required>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-group mb-3">
+                <label for="katilimci_ekleme_baslangic_tarihi" class="form-label">Katılımcı Ekleme Başlangıç Tarihi:</label>
+                <input type="date" class="form-control" id="katilimci_ekleme_baslangic_tarihi" name="katilimci_ekleme_baslangic_tarihi" required>
+            </div>
+            <div class="col-md-6 form-group mb-3">
+                <label for="katilimci_ekleme_bitis_tarihi" class="form-label">Katılımcı Ekleme Bitiş Tarihi:</label>
+                <input type="date" class="form-control" id="katilimci_ekleme_bitis_tarihi" name="katilimci_ekleme_bitis_tarihi" required>
+            </div>
+        </div>
+        <div class="form-group mb-3">
+            <label for="brans_id" class="form-label">Branş:</label>
+            <select class="form-control" id="brans_id" name="brans_id" required>
+                {% for brans in branslar %}
+                    <option value="{{ brans.id }}">{{ brans.brans_adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-4">
+            <label for="yasKategorileri" class="form-label">Yaş Kategorileri:</label>
+            <div id="yasKategorileri" class="row">
+                {% for yas_kategori in yas_kategorileri %}
+                <div class="col-md-6 col-lg-4 form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="yas_kategori_id[]" value="{{ yas_kategori.id }}" id="yasKategori{{ yas_kategori.id }}">
+                    <label class="form-check-label" for="yasKategori{{ yas_kategori.id }}">
+                        {{ yas_kategori.yas_kategori_adi }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Ekle</button>
+    </form>
+</div>
+{% endblock %}

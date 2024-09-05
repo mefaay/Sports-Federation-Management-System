@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Branş Düzenle{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div></div>
+    <form action="{{ url_for('brans_duzenle', brans_id=brans.id) }}" method="post">
+        <div class="form-group">
+            <label for="bransAdi">Branş Adı</label>
+            <input type="text" class="form-control" id="bransAdi" name="brans_adi" value="{{ brans.brans_adi }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sporDallari">Spor Dalları</label>
+            <select multiple class="form-control" id="sporDallari" name="spor_dallari">
+                {% for spor_dali in spor_dallari %}
+                    <option value="{{ spor_dali.id }}" {% if spor_dali.id in secili_dallar %} selected {% endif %}>{{ spor_dali.dal_adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sonucTurleri">Sonuç Türleri</label>
+            <select multiple class="form-control" id="sonucTurleri" name="sonuc_turleri">
+                {% for sonuc_turu in sonuc_turleri %}
+                    <option value="{{ sonuc_turu.id }}" {% if sonuc_turu.id in secili_turler %} selected {% endif %}>{{ sonuc_turu.tur_adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+    </form>
+</div>
+{% endblock %}

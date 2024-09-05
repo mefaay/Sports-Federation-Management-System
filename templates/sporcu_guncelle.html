@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}Sporcu Güncelle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white rounded-top">
+            <h3 class="mb-0">Sporcu Güncelle</h3>
+        </div>
+        <div class="card-body p-5">
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                
+                {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                <div class="form-group mb-4">
+                    <label for="foto" class="form-label">Fotoğraf:</label>
+                    <input type="file" name="foto" id="foto" class="form-control p-2">
+                    <!-- Mevcut fotoğrafı göster -->
+                    {% if sporcu.foto %}
+                        <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="Sporcu Fotoğrafı" class="img-fluid mt-3" style="height: 100px; border-radius: 10px;">
+                    {% else %}
+                        <!-- Varsayılan fotoğrafı göster -->
+                        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="img-fluid mt-3" style="height: 100px; border-radius: 10px;">
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="ad_soyad" class="form-label">Ad Soyad:</label>
+                            <input type="text" class="form-control p-3" name="ad_soyad" id="ad_soyad" value="{{ sporcu.ad_soyad }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="tc_no" class="form-label">TC No:</label>
+                            <input type="text" class="form-control p-3" name="tc_no" id="tc_no" value="{{ sporcu.tc_no }}" maxlength="11" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="dogum_tarihi" class="form-label">Doğum Tarihi:</label>
+                            <input type="date" class="form-control p-3" name="dogum_tarihi" id="dogum_tarihi" value="{{ sporcu.dogum_tarihi.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="lisans_no" class="form-label">Lisans No:</label>
+                            <input type="text" class="form-control p-3" name="lisans_no" id="lisans_no" value="{{ sporcu.lisans_no }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="cinsiyet" class="form-label">Cinsiyet:</label>
+                    <select class="form-select p-3" name="cinsiyet" id="cinsiyet" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="Erkek" {% if sporcu.cinsiyet == 'Erkek' %} selected {% endif %}>Erkek</option>
+                        <option value="Kadın" {% if sporcu.cinsiyet == 'Kadın' %} selected {% endif %}>Kadın</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="adres" class="form-label">Adres:</label>
+                    <textarea class="form-control p-3" name="adres" id="adres" rows="3">{{ sporcu.adres }}</textarea>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="telefon" class="form-label">Telefon:</label>
+                    <input type="tel" class="form-control p-3" name="telefon" id="telefon" value="{{ sporcu.telefon }}">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="il" class="form-label">İl:</label>
+                    <select class="form-select p-3" name="il" id="il" required>
+                        <option value="">İl Seçin</option>
+        <option value="Adana" {% if sporcu.il == 'Adana' %}selected{% endif %}>Adana</option>
+        <option value="Adıyaman" {% if sporcu.il == 'Adıyaman' %}selected{% endif %}>Adıyaman</option>
+        <option value="Afyonkarahisar" {% if sporcu.il == 'Afyonkarahisar' %}selected{% endif %}>Afyonkarahisar</option>
+<option value="Ağrı" {% if sporcu.il == 'Ağrı' %}selected{% endif %}>Ağrı</option>
+<option value="Amasya" {% if sporcu.il == 'Amasya' %}selected{% endif %}>Amasya</option>
+<option value="Ankara" {% if sporcu.il == 'Ankara' %}selected{% endif %}>Ankara</option>
+<option value="Antalya" {% if sporcu.il == 'Antalya' %}selected{% endif %}>Antalya</option>
+<option value="Artvin" {% if sporcu.il == 'Artvin' %}selected{% endif %}>Artvin</option>
+<option value="Aydın" {% if sporcu.il == 'Aydın' %}selected{% endif %}>Aydın</option>
+<option value="Balıkesir" {% if sporcu.il == 'Balıkesir' %}selected{% endif %}>Balıkesir</option>
+<option value="Bilecik" {% if sporcu.il == 'Bilecik' %}selected{% endif %}>Bilecik</option>
+<option value="Bingöl" {% if sporcu.il == 'Bingöl' %}selected{% endif %}>Bingöl</option>
+<option value="Bitlis" {% if sporcu.il == 'Bitlis' %}selected{% endif %}>Bitlis</option>
+<option value="Bolu" {% if sporcu.il == 'Bolu' %}selected{% endif %}>Bolu</option>
+<option value="Burdur" {% if sporcu.il == 'Burdur' %}selected{% endif %}>Burdur</option>
+<option value="Bursa" {% if sporcu.il == 'Bursa' %}selected{% endif %}>Bursa</option>
+<option value="Çanakkale" {% if sporcu.il == 'Çanakkale' %}selected{% endif %}>Çanakkale</option>
+<option value="Çankırı" {% if sporcu.il == 'Çankırı' %}selected{% endif %}>Çankırı</option>
+<option value="Çorum" {% if sporcu.il == 'Çorum' %}selected{% endif %}>Çorum</option>
+<option value="Denizli" {% if sporcu.il == 'Denizli' %}selected{% endif %}>Denizli</option>
+<option value="Diyarbakır" {% if sporcu.il == 'Diyarbakır' %}selected{% endif %}>Diyarbakır</option>
+<option value="Edirne" {% if sporcu.il == 'Edirne' %}selected{% endif %}>Edirne</option>
+<option value="Elazığ" {% if sporcu.il == 'Elazığ' %}selected{% endif %}>Elazığ</option>
+<option value="Erzincan" {% if sporcu.il == 'Erzincan' %}selected{% endif %}>Erzincan</option>
+<option value="Erzurum" {% if sporcu.il == 'Erzurum' %}selected{% endif %}>Erzurum</option>
+<option value="Eskişehir" {% if sporcu.il == 'Eskişehir' %}selected{% endif %}>Eskişehir</option>
+<option value="Gaziantep" {% if sporcu.il == 'Gaziantep' %}selected{% endif %}>Gaziantep</option>
+<option value="Giresun" {% if sporcu.il == 'Giresun' %}selected{% endif %}>Giresun</option>
+<option value="Gümüşhane" {% if sporcu.il == 'Gümüşhane' %}selected{% endif %}>Gümüşhane</option>
+<option value="Hakkari" {% if sporcu.il == 'Hakkari' %}selected{% endif %}>Hakkari</option>
+<option value="Hatay" {% if sporcu.il == 'Hatay' %}selected{% endif %}>Hatay</option>
+<option value="Isparta" {% if sporcu.il == 'Isparta' %}selected{% endif %}>Isparta</option>
+<option value="Mersin" {% if sporcu.il == 'Mersin' %}selected{% endif %}>Mersin</option>
+<option value="İstanbul" {% if sporcu.il == 'İstanbul' %}selected{% endif %}>İstanbul</option>
+<option value="İzmir" {% if sporcu.il == 'İzmir' %}selected{% endif %}>İzmir</option>
+<option value="Kahramanmaraş" {% if sporcu.il == 'Kahramanmaraş' %}selected{% endif %}>Kahramanmaraş</option>
+<option value="Karabük" {% if sporcu.il == 'Karabük' %}selected{% endif %}>Karabük</option>
+<option value="Karaman" {% if sporcu.il == 'Karaman' %}selected{% endif %}>Karaman</option>
+<option value="Kars" {% if sporcu.il == 'Kars' %}selected{% endif %}>Kars</option>
+<option value="Kastamonu" {% if sporcu.il == 'Kastamonu' %}selected{% endif %}>Kastamonu</option>
+<option value="Kayseri" {% if sporcu.il == 'Kayseri' %}selected{% endif %}>Kayseri</option>
+<option value="Kırıkkale" {% if sporcu.il == 'Kırıkkale' %}selected{% endif %}>Kırıkkale</option>
+<option value="Kırklareli" {% if sporcu.il == 'Kırklareli' %}selected{% endif %}>Kırklareli</option>
+<option value="Kırşehir" {% if sporcu.il == 'Kırşehir' %}selected{% endif %}>Kırşehir</option>
+<option value="Kilis" {% if sporcu.il == 'Kilis' %}selected{% endif %}>Kilis</option>
+<option value="Kocaeli" {% if sporcu.il == 'Kocaeli' %}selected{% endif %}>Kocaeli</option>
+<option value="Konya" {% if sporcu.il == 'Konya' %}selected{% endif %}>Konya</option>
+<option value="Kütahya" {% if sporcu.il == 'Kütahya' %}selected{% endif %}>Kütahya</option>
+<option value="Malatya" {% if sporcu.il == 'Malatya' %}selected{% endif %}>Malatya</option>
+<option value="Manisa" {% if sporcu.il == 'Manisa' %}selected{% endif %}>Manisa</option>
+<option value="Mardin" {% if sporcu.il == 'Mardin' %}selected{% endif %}>Mardin</option>
+<option value="Muğla" {% if sporcu.il == 'Muğla' %}selected{% endif %}>Muğla</option>
+<option value="Muş" {% if sporcu.il == 'Muş' %}selected{% endif %}>Muş</option>
+<option value="Nevşehir" {% if sporcu.il == 'Nevşehir' %}selected{% endif %}>Nevşehir</option>
+<option value="Niğde" {% if sporcu.il == 'Niğde' %}selected{% endif %}>Niğde</option>
+<option value="Ordu" {% if sporcu.il == 'Ordu' %}selected{% endif %}>Ordu</option>
+<option value="Osmaniye" {% if sporcu.il == 'Osmaniye' %}selected{% endif %}>Osmaniye</option>
+<option value="Rize" {% if sporcu.il == 'Rize' %}selected{% endif %}>Rize</option>
+<option value="Sakarya" {% if sporcu.il == 'Sakarya' %}selected{% endif %}>Sakarya</option>
+<option value="Samsun" {% if sporcu.il == 'Samsun' %}selected{% endif %}>Samsun</option>
+<option value="Siirt" {% if sporcu.il == 'Siirt' %}selected{% endif %}>Siirt</option>
+<option value="Sinop" {% if sporcu.il == 'Sinop' %}selected{% endif %}>Sinop</option>
+<option value="Sivas" {% if sporcu.il == 'Sivas' %}selected{% endif %}>Sivas</option>
+<option value="Şanlıurfa" {% if sporcu.il == 'Şanlıurfa' %}selected{% endif %}>Şanlıurfa</option>
+<option value="Şırnak" {% if sporcu.il == 'Şırnak' %}selected{% endif %}>Şırnak</option>
+<option value="Tekirdağ" {% if sporcu.il == 'Tekirdağ' %}selected{% endif %}>Tekirdağ</option>
+<option value="Tokat" {% if sporcu.il == 'Tokat' %}selected{% endif %}>Tokat</option>
+<option value="Trabzon" {% if sporcu.il == 'Trabzon' %}selected{% endif %}>Trabzon</option>
+<option value="Tunceli" {% if sporcu.il == 'Tunceli' %}selected{% endif %}>Tunceli</option>
+<option value="Uşak" {% if sporcu.il == 'Uşak' %}selected{% endif %}>Uşak</option>
+<option value="Van" {% if sporcu.il == 'Van' %}selected{% endif %}>Van</option>
+<option value="Yalova" {% if sporcu.il == 'Yalova' %}selected{% endif %}>Yalova</option>
+<option value="Yozgat" {% if sporcu.il == 'Yozgat' %}selected{% endif %}>Yozgat</option>
+<option value="Zonguldak" {% if sporcu.il == 'Zonguldak' %}selected{% endif %}>Zonguldak</option>
+                    </select>
+                </div>
+
+                {% if session['role'] in ['Yonetici'] %}
+                    <div class="form-group mb-4">
+                        <label>Sporcu Tipi:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sporcu_tipi" id="kulup_sporcusu" value="kulup" {% if sporcu_tipi == 'kulup' %}checked{% endif %}>
+                            <label class="form-check-label" for="kulup_sporcusu">Kulüp Sporcusu</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sporcu_tipi" id="ferdi_sporcu" value="ferdi" {% if sporcu_tipi == 'ferdi' %}checked{% endif %}>
+                            <label class="form-check-label" for="ferdi_sporcu">Ferdi Sporcu</label>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4 d-none" id="kulupSecim">
+                        <label for="kulup_id" class="form-label">Kulüp:</label>
+                        <select class="form-select p-3" name="kulup_id" id="kulup_id">
+                            <option value="">Seçiniz...</option>
+            {% for kulup in kulupler %}
+                            <option value="{{ kulup.id }}" {% if sporcu.kulup_id == kulup.id %}selected{% endif %}>{{ kulup.kulup_adi }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-4 d-none" id="ilTemsilcisiSecim">
+                        <label for="il_temsilcisi_id" class="form-label">İl Temsilcisi:</label>
+                        <select class="form-select p-3" name="il_temsilcisi_id" id="il_temsilcisi_id">
+                            <option value="">Seçiniz...</option>
+            {% for temsilci in il_temsilcileri %}
+                            <option value="{{ temsilci.id }}" {% if sporcu.il_temsilcisi_id == temsilci.id %}selected{% endif %}>{{ temsilci.il }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% else %}
+                    <input type="hidden" name="sporcu_tipi" value="{{ sporcu.sporcu_tipi }}">
+                    <input type="hidden" name="kulup_id" value="{{ sporcu.kulup_id }}">
+                    <input type="hidden" name="il_temsilcisi_id" value="{{ sporcu.il_temsilcisi_id }}">
+                {% endif %}
+
+                <button type="submit" class="btn btn-dark w-100 p-3 rounded-pill">Güncelle</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sporcuTipiRadios = document.getElementsByName('sporcu_tipi');
+    var kulupSecimDiv = document.getElementById('kulupSecim');
+    var ilTemsilcisiSecimDiv = document.getElementById('ilTemsilcisiSecim');
+
+    function toggleSelection() {
+        if (document.getElementById('kulup_sporcusu').checked) {
+            kulupSecimDiv.classList.remove('d-none');
+            ilTemsilcisiSecimDiv.classList.add('d-none');
+        } else if (document.getElementById('ferdi_sporcu').checked) {
+            kulupSecimDiv.classList.add('d-none');
+            ilTemsilcisiSecimDiv.classList.remove('d-none');
+        }
+    }
+
+    sporcuTipiRadios.forEach(function(radio) {
+        radio.addEventListener('change', toggleSelection);
+    });
+
+    // İlk yüklemede doğru alanı göstermek için fonksiyonu çağır
+    toggleSelection();
+});
+</script>
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #4a90e2, #007bff);
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-dark {
+        background: linear-gradient(135deg, #343a40, #000);
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: linear-gradient(135deg, #000, #343a40);
+    }
+</style>
+{% endblock %}

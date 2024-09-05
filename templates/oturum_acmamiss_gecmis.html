@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Oturum Açmamış Kullanıcı Geçmişi{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #343a40;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    h2 {
+        color: #343a40;
+    }
+</style>
+
+<h2>Oturum Açmamış Kullanıcı Geçmişi - IP: {{ ip_adresi }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>URL</th>
+            <th>Zaman</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for gecmis in gecmis %}
+        <tr>
+            <td>{{ gecmis.url }}</td>
+            <td>{{ gecmis.zaman }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-end">
+    <form method="post" action="{{ url_for('temizle_oturum_acmamiss_gecmis', ip_adresi=ip_adresi) }}">
+        <button type="submit" class="btn-temizle">Geçmişi Temizle</button>
+    </form>
+</div>
+
+{% endblock %}

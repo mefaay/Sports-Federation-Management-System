@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Görevlendirme Talepleri{% endblock %}
+
+{% block content %}
+<h1>Görevlendirme Talepleri</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Fotoğraf</th> <!-- Fotoğraf sütunu -->
+            <th>Hakem</th>
+            <th>Derecesi</th>
+            <th>Talep Tarihi</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for talep in talepler %}
+        <tr>
+            <td>
+                <img src="{{ url_for('static', filename='uploads/' + talep.hakem.foto) }}" alt="Hakem Fotoğrafı" class="img-fluid rounded-circle shadow-sm" style="width: 100px; height: 100px;">
+            </td> <!-- Fotoğraf ekleme kısmı -->
+            <td>{{ talep.hakem.ad_soyad }}</td>
+            <td>{{ talep.hakem.derece }}</td>
+            <td>{{ talep.talep_tarihi }}</td>
+            <td>{{ talep.durum.value }}</td>
+            <td>
+                <form action="{{ url_for('gorevlendirme_talebi_onayla', talep_id=talep.id) }}" method="post" style="display:inline;">
+                    {{ csrf_input() }}
+                    <button type="submit" class="btn btn-success">Onayla</button>
+                </form>
+                <form action="{{ url_for('gorevlendirme_talebi_reddet', talep_id=talep.id) }}" method="post" style="display:inline;">
+                    {{ csrf_input() }}
+                    <input type="text" name="red_sebebi" placeholder="Reddetme sebebi" required>
+                    <button type="submit" class="btn btn-danger">Reddet</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

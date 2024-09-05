@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+
+{% block title %}Sporcu Detayı{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+    }
+
+    .card-body h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    .table th {
+        font-weight: bold;
+        color: #343a40;
+        border-top: none;
+    }
+
+    .table td {
+        color: #6c757d;
+    }
+
+    .nav-tabs .nav-link {
+        border-radius: 50px;
+        background-color: #f8f9fa;
+        margin-right: 10px;
+        color: #007bff;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .nav-tabs .nav-link:hover {
+        background-color: #e2e6ea;
+    }
+
+    .img-fluid {
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .profile-photo {
+        width: 100%;
+        height: auto;
+        max-height: 400px; /* Fotoğrafın maksimum yüksekliği */
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover; /* Resmin kırpılmasını sağlar */
+    }
+    .tab-content h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .table-borderless th,
+    .table-borderless td {
+        padding: 0.3rem;
+    }
+
+    /* Mobil uyumluluk */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+
+        .img-fluid {
+            width: 100%;
+            height: auto;
+        }
+
+        .table th, .table td {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            font-size: 0.875rem;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .tab-content h2 {
+            font-size: 1.25rem;
+            text-align: center;
+        }
+
+        /* Mobilde tablonun yatay kaydırılabilir olmasını sağla */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* İçeriklerin daha dar ekranlarda düzgün görünmesini sağla */
+        .table-responsive .table th,
+        .table-responsive .table td {
+            white-space: nowrap;
+        }
+
+        .table-borderless {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <!-- Sporcu Bilgileri -->
+            <h2>Sporcu Bilgileri</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <!-- Sporcu Fotoğrafı -->
+                    {% if sporcu.foto %}
+                        <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="{{ sporcu.ad_soyad }}" class="profile-photo">
+                    {% else %}
+                        <!-- Display a default image if there is no photo -->
+                        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Default Image" class="profile-photo">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Ad Soyad</th>
+                                <td>{{ sporcu.ad_soyad }}</td>
+                            </tr>
+                            {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+                            <tr>
+                                <th scope="row">TC No</th>
+                                <td>{{ sporcu.tc_no }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th scope="row">Doğum Tarihi</th>
+                                <td>{{ sporcu.dogum_tarihi.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Lisans No</th>
+                                <td>{{ sporcu.lisans_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Cinsiyet</th>
+                                <td>{{ sporcu.cinsiyet }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Adres</th>
+                                <td>{{ sporcu.adres }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Telefon</th>
+                                <td>{{ sporcu.telefon }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">İl</th>
+                                <td>{{ sporcu.il }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+        <!-- Transfer Et Butonu -->
+<button type="button" id="transferBtn" class="btn btn-warning mt-3">
+    Transfer Et
+</button>
+
+        <!-- Transferi Geri Al Butonu (Sadece Transfer Edilmiş Sporcular için) -->
+{% if sporcu.eski_sporcu_id %}
+<form action="{{ url_for('sporcu_transfer_geri_al', yeni_sporcu_id=sporcu.id) }}" method="POST" style="display:inline;">
+    <button type="submit" class="btn btn-danger mt-3">Transferi Geri Al</button>
+</form>
+{% endif %}
+
+
+    </div>
+</div>
+        </div>
+    </div>
+
+    <!-- Detaylar Sekmeleri -->
+    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+        {% if sporcu.kulup %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="kulup-tab" data-bs-toggle="tab" data-bs-target="#kulup" type="button" role="tab" aria-controls="kulup" aria-selected="true">Kulüp</button>
+            </li>
+        {% else %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="il-temsilcisi-tab" data-bs-toggle="tab" data-bs-target="#il-temsilcisi" type="button" role="tab" aria-controls="il-temsilcisi" aria-selected="true">İl Temsilcisi</button>
+            </li>
+        {% endif %}
+        {% if session['role'] in ['Kulup', 'Yonetici'] %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="antrenorler-tab" data-bs-toggle="tab" data-bs-target="#antrenorler" type="button" role="tab" aria-controls="antrenorler" aria-selected="false">Antrenörler</button>
+        </li>
+        {% endif %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="musabakalar-tab" data-bs-toggle="tab" data-bs-target="#musabakalar" type="button" role="tab" aria-controls="musabakalar" aria-selected="false">Müsabakalar & Sonuçlar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="transfer-gecmisi-tab" data-bs-toggle="tab" data-bs-target="#transfer-gecmisi" type="button" role="tab" aria-controls="transfer-gecmisi" aria-selected="false">Transfer Geçmişi</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        {% if sporcu.kulup %}
+            <div class="tab-pane fade show active" id="kulup" role="tabpanel" aria-labelledby="kulup-tab">
+                <h2 class="mt-2">Kulüp Bilgileri</h2>
+                <p>Kulüp Adı: {{ sporcu.kulup.kulup_adi }}</p>
+                <p>Başkan Adı Soyadı: {{ sporcu.kulup.baskan_adi }}</p>
+                <p>Başkan Telefon: {{ sporcu.kulup.telefon }}</p>
+                <!-- Diğer kulüp bilgileri -->
+            </div>
+        {% else %}
+            <div class="tab-pane fade show active" id="il-temsilcisi" role="tabpanel" aria-labelledby="il-temsilcisi-tab">
+                <h2 class="mt-2">İl Temsilcisi: {{ sporcu.il_temsilcisi.ad_soyad }}</h2>
+                <p>Telefon: {{ sporcu.il_temsilcisi.telefon }}</p>
+                <p>Eposta: {{ sporcu.il_temsilcisi.eposta }}</p>
+                <!-- Diğer il temsilcisi bilgileri -->
+            </div>
+        {% endif %}
+
+        <!-- Antrenörler Sekmesi -->
+        {% if session['role'] in ['Kulup', 'Yonetici'] %}
+        <div class="tab-pane fade" id="antrenorler" role="tabpanel" aria-labelledby="antrenorler-tab">
+            <h2 class="mt-2">Antrenörler</h2>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sıra No</th>
+                            <th scope="col">Foto</th>
+                            <th scope="col">Ad Soyad</th>
+                            <th scope="col">Telefon</th>
+                            <th scope="col">Eposta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for antrenor in antrenorler %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>
+                                {% if antrenor.foto %}
+                                <img src="{{ url_for('static', filename='uploads/' + antrenor.foto) }}" alt="{{ antrenor.ad_soyad }}" class="img-fluid" style="height: 50px; width: 50px; border-radius: 50%;">
+                                {% else %}
+                                No Image
+                                {% endif %}
+                            </td>
+                            <td>{{ antrenor.ad_soyad }}</td>
+                            <td>{{ antrenor.telefon }}</td>
+                            <td>{{ antrenor.eposta }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Müsabakalar Sekmesi -->
+        <div class="tab-pane fade" id="musabakalar" role="tabpanel" aria-labelledby="musabakalar-tab">
+            <h2 class="mt-2">Müsabakalar & Sonuçlar</h2>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sıra No</th>
+                            <th scope="col">Müsabaka Adı</th>
+                            <th scope="col">Sonuçlar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for musabaka in musabakalar %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>{{ musabaka.musabaka_adi }}</td>
+                            <td>
+                                <!-- Sonuçlar için ayrı satır -->
+                                {% if musabaka_sonuclari.get(musabaka.id) %}
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            {% for sonuc in musabaka_sonuclari[musabaka.id] %}
+                                            {% if sonuc.deger %}
+                                            <td>{{ sonuc.sonucturu.tur_adi }}: {{ sonuc.deger }}</td>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <p>Sonuçlar bulunamadı veya henüz eklenmedi.</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+<!-- Transfer Geçmişi Sekmesi -->
+<div class="tab-pane fade" id="transfer-gecmisi" role="tabpanel" aria-labelledby="transfer-gecmisi-tab">
+    <h2 class="mt-2">Transfer Geçmişi</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Tarih</th>
+                    <th scope="col">Eski Kulüp/İl Temsilcisi</th>
+                    <th scope="col">Yeni Kulüp/İl Temsilcisi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if transfer_gecmisi %}
+                    {% for transfer in transfer_gecmisi %}
+                        <tr>
+                            <td>{{ transfer.transfer_tarihi.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if transfer.eski_kulup %}
+                                    {{ transfer.eski_kulup }}
+                                {% elif transfer.eski_il_temsilcisi %}
+                                    {{ transfer.eski_il_temsilcisi }}
+                                {% else %}
+                                    Bilinmiyor
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if transfer.yeni_kulup %}
+                                    {{ transfer.yeni_kulup }}
+                                {% elif transfer.yeni_il_temsilcisi %}
+                                    {{ transfer.yeni_il_temsilcisi }}
+                                {% else %}
+                                    Bilinmiyor
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="3">Transfer geçmişi bulunmamaktadır.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<!-- Transfer Modal -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transferModalLabel">Sporcu Transferi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sporcunun nereye transfer edileceğini seçin:</p>
+                <div class="btn-group d-flex" role="group">
+                    <button type="button" class="btn btn-outline-primary w-50" id="kulupBtn">Kulüp</button>
+                    <button type="button" class="btn btn-outline-secondary w-50" id="ilTemsilcisiBtn">Ferdi (İl Temsilcisi)</button>
+                </div>
+
+                <!-- Kulüp Listesi -->
+                <div class="mt-3" id="kulupList" style="display: none;">
+                    <h6>Kulüp Seç:</h6>
+                    <form id="transferForm" method="POST" action="{{ url_for('sporcu_transfer_et', sporcu_id=sporcu.id) }}">
+                        <select class="form-select" name="kulup_id">
+                            {% for kulup in kulupler %}
+                            <option value="{{ kulup.id }}">{{ kulup.kulup_adi }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+
+                <!-- İl Temsilcisi Listesi -->
+                <div class="mt-3" id="ilTemsilcisiList" style="display: none;">
+                    <h6>İl Temsilcisi Seç:</h6>
+                    <form id="transferForm" method="POST" action="{{ url_for('sporcu_transfer_et', sporcu_id=sporcu.id) }}">
+                        <select class="form-select" name="il_temsilcisi_id">
+                            {% for il_temsilcisi in il_temsilcileri %}
+                            <option value="{{ il_temsilcisi.id }}">{{ il_temsilcisi.il }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="submit" form="transferForm" class="btn btn-primary">Transfer Et</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('kulupBtn').addEventListener('click', function () {
+        document.getElementById('kulupList').style.display = 'block';
+        document.getElementById('ilTemsilcisiList').style.display = 'none';
+    });
+
+    document.getElementById('ilTemsilcisiBtn').addEventListener('click', function () {
+        document.getElementById('kulupList').style.display = 'none';
+        document.getElementById('ilTemsilcisiList').style.display = 'block';
+    });
+</script>
+<script>
+document.getElementById('transferBtn').addEventListener('click', function () {
+    var userRole = "{{ session['role'] }}";
+    if (userRole === 'Yonetici') {
+        // Kullanıcı yönetici ise modalı aç
+        var transferModal = new bootstrap.Modal(document.getElementById('transferModal'), {});
+        transferModal.show();
+    } else {
+        // Kullanıcı yönetici değilse uyarı göster
+        alert('Bu işlem sadece federasyon yöneticileri tarafından yapılabilir.');
+    }
+});
+
+</script>
+{% endblock %}

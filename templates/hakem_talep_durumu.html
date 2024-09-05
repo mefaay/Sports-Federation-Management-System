@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Talep Durumu{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mb-4">Görev Talep Durumu</h1>
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Müsabaka Adı</th>
+                            <th scope="col">Talep Tarihi</th>
+                            <th scope="col">Durum</th>
+                            <th scope="col">Red Sebebi</th>
+                            <th scope="col">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for talep in talepler %}
+                        <tr>
+                            <td>{{ talep.musabaka.musabaka_adi }}</td>
+                            <td>{{ talep.talep_tarihi.strftime('%d %B %Y, %H:%M').replace('January', 'Ocak').replace('February', 'Şubat').replace('March', 'Mart').replace('April', 'Nisan').replace('May', 'Mayıs').replace('June', 'Haziran').replace('July', 'Temmuz').replace('August', 'Ağustos').replace('September', 'Eylül').replace('October', 'Ekim').replace('November', 'Kasım').replace('December', 'Aralık') }}</td>
+                            <td>
+                                {% if talep.durum.value == 'Onaylandı' %}
+                                    <span class="badge bg-success">Onaylandı</span>
+                                {% elif talep.durum.value == 'Beklemede' %}
+                                    <span class="badge bg-warning">Beklemede</span>
+                                {% elif talep.durum.value == 'Reddedildi' %}
+                                    <span class="badge bg-danger">Reddedildi</span>
+                                {% elif talep.durum.value == 'Görevden Kaldırıldı' %}
+                                    <span class="badge bg-secondary">Görevden Kaldırıldı</span>
+                                {% endif %}
+                            </td>
+                            {% if talep.durum.value == 'Reddedildi' and talep.red_sebebi %}
+                            <td>{{ talep.red_sebebi }}</td>
+                            {% else %}
+                            <td>-</td>
+                            {% endif %}
+                            <td>
+                                <form method="post" action="{{ url_for('talep_geri_cek', talep_id=talep.id) }}" onsubmit="return confirm('Bu görevi geri çekmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-danger btn-sm" {% if talep.durum.value == 'Onaylandı' %}disabled{% endif %}>Geri Çek</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

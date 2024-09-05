@@ -1,0 +1,54 @@
+<!-- hakem_basvuru_listesi.html -->
+{% extends 'base.html' %}
+
+{% block title %}Hakem Başvuru Listesi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Hakem Başvuru Listesi</h2>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Fotoğraf</th>				
+                <th>Ad Soyad</th>
+                <th>TC Kimlik No</th>
+                <th>Doğum Tarihi</th>
+                <th>Telefon</th>
+                <th>E-posta</th>
+                <th>İl</th>
+                <th>Detay</th>
+				<th>Onayla</th>
+                <th>Sil</th> <!-- Silme düğmesi eklendi -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for HakemBasvuru in hakem_basvurulari %}
+            <tr>
+                <td>{{ HakemBasvuru.id }}</td>
+                <td><img src="{{ url_for('static', filename='adayhakem/' + HakemBasvuru.foto) }}" alt="Fotoğraf" height="100" width="100"></td>
+                <td>{{ HakemBasvuru.ad_soyad }}</td>
+                <td>{{ HakemBasvuru.tc_kimlik_no }}</td>
+                <td>{{ HakemBasvuru.dogum_tarihi }}</td>
+                <td>{{ HakemBasvuru.telefon }}</td>
+                <td>{{ HakemBasvuru.eposta }}</td>
+                <td>{{ HakemBasvuru.il }}</td>
+                <td><a href="{{ url_for('hakem_basvuru_detay', id=HakemBasvuru.id) }}" class="btn btn-info btn-sm">Detay</a></td>
+				                <td>
+                    <form method="post" action="{{ url_for('hakem_basvuru_onayla', basvuru_id=HakemBasvuru.id) }}">
+                        <button type="submit" class="btn btn-success btn-sm">Onayla</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="{{ url_for('hakem_basvuru_sil', id=HakemBasvuru.id) }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

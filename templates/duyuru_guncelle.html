@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Duyuru Güncelle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Duyuru Güncelle</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="baslik" class="form-label">Başlık</label>
+            <input type="text" class="form-control" id="baslik" name="baslik" value="{{ duyuru.baslik }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="icerik" class="form-label">İçerik</label>
+            <textarea class="form-control" id="icerik" name="icerik" rows="5" required>{{ duyuru.icerik }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+    </form>
+</div>
+{% endblock %}

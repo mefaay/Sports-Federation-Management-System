@@ -1,0 +1,493 @@
+{% extends 'base.html' %}
+
+{% block title %}Sporcu Katılımı - {{ musabaka.musabaka_adi }}{% endblock %}
+
+{% block content %}
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <img src="{{ url_for('static', filename='images/gsblogo.png') }}" alt="Sol Logo" class="img-fluid" style="height: 80px;">
+        <h2 class="display-6 text-center" style="max-width: 70%; word-wrap: break-word; word-break: break-word;">
+            {{ musabaka.musabaka_adi }} Müsabakası için Sporcu Ekleme
+        </h2>
+        <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Sağ Logo" class="img-fluid" style="height: 80px;">
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert-container">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Sol Kısım - Sporcu Seç -->
+        <div class="col-md-6 mb-4">
+            <h3 class="mb-3">Sporcu Seç</h3>
+            <div class="d-flex mb-3">
+                <input type="text" class="form-control me-2" id="sporcu-ara" placeholder="Sporcu ismiyle ara" onkeyup="filterTable('sporcu-listesi', 'sporcu-ara')">
+                <select class="form-select" id="cinsiyetFiltre" onchange="filterByCinsiyet()">
+                    <option value="">Cinsiyet</option>
+                    <option value="Erkek">Erkek</option>
+                    <option value="Kadın">Kadın</option>
+                </select>
+            </div>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" style="width: 5%;">
+                                <input type="checkbox" id="select-all" onclick="toggleAllCheckboxes(this)">
+                            </th>
+                            <th scope="col" style="width: 10%;">Sıra</th>
+                            <th scope="col" style="width: 15%;">Foto</th>
+                            <th scope="col" class="col-name" style="width: 40%;">Ad Soyad</th>
+                            <th scope="col" style="width: 15%;">D. Yılı</th>
+                            <th scope="col" style="width: 15%;">Cinsiyet</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sporcu-listesi">
+                        {% for sporcu in sporcular %}
+                        <tr data-id="{{ sporcu.id }}">
+                            <td>
+                                <input type="checkbox" class="sporcu-checkbox" name="sporcu_ids" value="{{ sporcu.id }}" {% if sporcu.id in eklenen_sporcular_ids %}disabled{% endif %}>
+                            </td>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                {% if sporcu.foto %}
+                                    <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="Sporcu Fotoğrafı" class="img-fluid rounded-circle" style="height: 50px; width: 50px;">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="img-fluid rounded-circle" style="height: 50px; width: 50px;">
+                                {% endif %}
+                            </td>
+                            <td class="text-truncate">{{ sporcu.ad_soyad }}</td>
+                            <td>{{ sporcu.dogum_tarihi.strftime('%Y') if sporcu.dogum_tarihi else 'Bilinmiyor' }}</td>
+                            <td>{{ sporcu.cinsiyet }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary mt-3" onclick="showKategoriModal()">Seçilen Sporcuları Ekle</button>
+        </div>
+        <div class="col-md-6 mb-4">
+            <h3 class="mb-3">Eklenen Sporcular</h3>
+            <div class="d-flex mb-3">
+                <input type="text" class="form-control me-2" id="eklenen-sporcu-ara" placeholder="Eklenen sporcu ismiyle ara" onkeyup="filterTable('eklenen-sporcular', 'eklenen-sporcu-ara')">
+                <select class="form-select" id="yasKategoriFiltre" onchange="filterByKategori()">
+                    <option value="">Yaş Kategorisi</option>
+                    {% for yas_kategori in musabaka.yas_kategorileri %}
+                    <option value="{{ yas_kategori.yas_kategori_adi }}">{{ yas_kategori.yas_kategori_adi }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">
+                                <input type="checkbox" id="select-all-added" onclick="toggleAllAddedCheckboxes(this)">
+                            </th>
+                            <th scope="col">Sıra</th>
+                            <th scope="col">Foto</th>
+                            <th scope="col">Ad Soyad</th>
+                            <th scope="col">D.Yılı</th>
+							<th scope="col">Cinsiyet</th>
+                            <th scope="col">Derece</th>
+                            <th scope="col">Kategori</th>
+                            <th scope="col">Aksiyon</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eklenen-sporcular">
+                        {% for katilimci in eklenen_sporcular %}
+                        <tr data-id="{{ katilimci.sporcu.id }}">
+                            <td>
+                                <input type="checkbox" class="added-sporcu-checkbox" name="added_sporcu_ids" value="{{ katilimci.sporcu.id }}">
+                            </td>
+                            <td>{{ loop.index }}</td>
+                            {% if katilimci.sporcu.foto %}
+                                <td><img src="{{ url_for('static', filename='uploads/' + katilimci.sporcu.foto) }}" alt="Sporcu Fotoğrafı" class="img-fluid rounded-circle" style="height: 50px; width: 50px;"></td>
+                            {% else %}
+                                <td><img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="img-fluid rounded-circle" style="height: 50px; width: 50px;"></td>
+                            {% endif %}
+                            <td>{{ katilimci.sporcu.ad_soyad }}</td>
+                            <td>{{ katilimci.sporcu.dogum_tarihi.strftime('%Y') if katilimci.sporcu.dogum_tarihi else 'Bilinmiyor' }}</td>
+                            <td>{{ katilimci.sporcu.cinsiyet }}</td>
+<td>{{ katilimci.derece or "No Time" }}</td>
+<td>{{ katilimci.yas_kategori.yas_kategori_adi if katilimci.yas_kategori else "None" }}</td>
+<td>
+    <button class="btn btn-secondary btn-custom" onclick="showEditKategoriModal('{{ katilimci.sporcu.id }}', '{{ katilimci.yas_kategori.id if katilimci.yas_kategori else "None" }}')">K/D Düzenle</button>
+</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-danger mt-3" onclick="removeSelectedAthletes()">Seçilen Sporcuları Çıkart</button>
+        </div>
+    </div>
+</div>
+
+<!-- Yaş Kategorisi Seçim Modalı -->
+<div class="modal fade" id="kategoriModal" tabindex="-1" aria-labelledby="kategoriModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kategoriModalLabel">Yaş Kategorisi ve Derece Belirle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="kategori-form">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Ad Soyad</th>
+                                <th scope="col">Yaş Kategorisi</th>
+                                <th scope="col">Derece</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kategori-table-body">
+                            <!-- Seçilen sporcular buraya eklenecek -->
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" onclick="submitKategoriForm()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kategori Düzenle Modalı -->
+<div class="modal fade" id="editKategoriModal" tabindex="-1" aria-labelledby="editKategoriModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editKategoriModalLabel">Yaş Kategorisi / Derece Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editKategoriModalSelect" class="form-label">Yaş Kategorisi</label>
+                    <select class="form-select" id="editKategoriModalSelect" name="yas_kategori_id" required>
+                        {% for yas_kategori in musabaka.yas_kategorileri %}
+                        <option value="{{ yas_kategori.id }}">{{ yas_kategori.yas_kategori_adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editDereceModal" class="form-label">Derece</label>
+                    <input type="text" class="form-control" id="editDereceModal" name="derece">
+                </div>
+                <input type="hidden" id="editKategoriSporcuId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" onclick="updateKategori()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showKategoriModal() {
+    var checkboxes = document.querySelectorAll('.sporcu-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('Lütfen en az bir sporcu seçin.');
+    } else {
+        var kategoriTableBody = document.getElementById('kategori-table-body');
+        kategoriTableBody.innerHTML = ''; // Temizle
+        checkboxes.forEach(function(checkbox) {
+            var sporcuId = checkbox.value;
+            var sporcuRow = checkbox.closest('tr');
+            var sporcuAdSoyad = sporcuRow.getElementsByTagName('td')[3].innerText;
+
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${sporcuAdSoyad}</td>
+                <td>
+                    <select class="form-select yas-kategori-select" name="yas_kategori_${sporcuId}">
+                        {% for yas_kategori in musabaka.yas_kategorileri %}
+                        <option value="{{ yas_kategori.id }}">{{ yas_kategori.yas_kategori_adi }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control derece-input" name="derece_${sporcuId}">
+                </td>
+            `;
+            kategoriTableBody.appendChild(row);
+        });
+
+        var kategoriModal = new bootstrap.Modal(document.getElementById('kategoriModal'));
+        kategoriModal.show();
+    }
+}
+
+function submitKategoriForm() {
+    var checkboxes = document.querySelectorAll('.sporcu-checkbox:checked');
+    var form = document.getElementById('kategori-form');
+    var formData = new FormData(form);
+    var eklenenSporcularDiv = document.getElementById('eklenen-sporcular');
+
+    checkboxes.forEach(function(checkbox) {
+        var sporcuId = checkbox.value;
+        var sporcuRow = checkbox.closest('tr');
+        var yasKategoriId = formData.get('yas_kategori_' + sporcuId);
+        var derece = formData.get('derece_' + sporcuId);
+
+        // AJAX isteği
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "{{ url_for('ekle_toplu_sporcu_musabaka', musabaka_id=musabaka.id) }}", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Sporcu ekleme başarılı ise, sol listeden kaldır ve sağ listeye ekle
+                sporcuRow.remove();
+
+                var newRow = document.createElement('tr');
+                newRow.setAttribute('data-id', sporcuId);
+                newRow.innerHTML = `
+                    <td><input type="checkbox" class="added-sporcu-checkbox" name="added_sporcu_ids" value="${sporcuId}"></td>
+                    <td>${eklenenSporcularDiv.getElementsByTagName('tr').length + 1}</td>
+                    <td><img src="${sporcuRow.getElementsByTagName('img')[0].src}" alt="Sporcu Fotoğrafı" class="img-thumbnail" style="height: 50px; width: 50px;"></td>
+                    <td>${sporcuRow.getElementsByTagName('td')[3].innerText}</td>
+                    <td>${sporcuRow.getElementsByTagName('td')[4].innerText}</td>
+                    <td>${sporcuRow.getElementsByTagName('td')[5].innerText}</td>
+                    <td>${derece}</td>
+                    <td>${document.querySelector(`select[name='yas_kategori_${sporcuId}'] option:checked`).text}</td>
+                    <td><button class="btn btn-secondary" onclick="showEditKategoriModal('${sporcuId}', '${yasKategoriId}')">K/D Düzenle</button></td>
+                `;
+                eklenenSporcularDiv.appendChild(newRow);
+            } else if (xhr.readyState == 4 && xhr.status != 200) {
+                alert('Sporcu eklenirken bir hata oluştu.');
+            }
+        };
+        xhr.send("sporcu_ids=" + sporcuId + "&yas_kategori_id=" + yasKategoriId + "&derece=" + encodeURIComponent(derece));
+    });
+
+    var kategoriModal = bootstrap.Modal.getInstance(document.getElementById('kategoriModal'));
+    kategoriModal.hide();
+}
+
+function removeSelectedAthletes() {
+    var checkboxes = document.querySelectorAll('.added-sporcu-checkbox:checked');
+    var sporcuListesi = document.getElementById('sporcu-listesi');
+
+    checkboxes.forEach(function(checkbox) {
+        var sporcuId = checkbox.value;
+        var sporcuRow = checkbox.closest('tr');
+
+        // AJAX isteği
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "{{ url_for('cikar_toplu_sporcu_musabaka', musabaka_id=musabaka.id) }}", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Sporcu çıkarma başarılı ise, sağ listeden kaldır ve sol listeye ekle
+                sporcuRow.remove();
+
+                var newRow = document.createElement('tr');
+                newRow.setAttribute('data-id', sporcuId);
+                newRow.innerHTML = `
+                    <td><input type="checkbox" class="sporcu-checkbox" name="sporcu_ids" value="${sporcuId}"></td>
+                    <td>${sporcuListesi.getElementsByTagName('tr').length + 1}</td>
+                    <td><img src="${sporcuRow.getElementsByTagName('img')[0].src}" alt="Sporcu Fotoğrafı" class="img-thumbnail" style="height: 50px; width: 50px;"></td>
+                    <td>${sporcuRow.getElementsByTagName('td')[3].innerText}</td>
+                    <td>${sporcuRow.getElementsByTagName('td')[4].innerText}</td>
+                    <td>${sporcuRow.getElementsByTagName('td')[5].innerText}</td>
+                    <td>${sporcuRow.getElementsByTagName('td')[6].innerText}</td>
+                `;
+                sporcuListesi.appendChild(newRow);
+            } else if (xhr.readyState == 4 && xhr.status != 200) {
+                alert('Sporcu çıkarılırken bir hata oluştu.');
+            }
+        };
+        xhr.send("sporcu_ids=" + sporcuId);
+    });
+}
+
+function showEditKategoriModal(sporcuId, currentKategoriId) {
+    document.getElementById('editKategoriSporcuId').value = sporcuId;
+    document.getElementById('editKategoriModalSelect').value = currentKategoriId;
+
+    var editKategoriModal = new bootstrap.Modal(document.getElementById('editKategoriModal'));
+    editKategoriModal.show();
+}
+
+function updateKategori() {
+    var sporcuId = document.getElementById('editKategoriSporcuId').value;
+    var yeniKategoriId = document.getElementById('editKategoriModalSelect').value;
+    var derece = document.getElementById('editDereceModal').value;  // Dereceyi alıyoruz
+
+    // AJAX isteği
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "{{ url_for('update_kategori', musabaka_id=musabaka.id) }}", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Başarılı güncelleme, sayfayı yenile veya DOM'u güncelle
+            location.reload();  // Veya DOM'u güncellemek için ek kod
+        } else if (xhr.readyState == 4 && xhr.status != 200) {
+            alert('Kategori güncellenirken bir hata oluştu.');
+        }
+    };
+    xhr.send("sporcu_id=" + sporcuId + "&yas_kategori_id=" + yeniKategoriId + "&derece=" + derece);
+}
+
+function toggleAllCheckboxes(source) {
+    var checkboxes = document.querySelectorAll('.sporcu-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = source.checked;
+    });
+}
+
+function toggleAllAddedCheckboxes(source) {
+    var checkboxes = document.querySelectorAll('.added-sporcu-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = source.checked;
+    });
+}
+
+function turkishToLowerCase(str) {
+    var letters = { "İ": "i", "I": "ı", "Ş": "ş", "Ğ": "ğ", "Ü": "ü", "Ö": "ö", "Ç": "ç", "ı": "i", "ş": "s", "ğ": "g", "ü": "u", "ö": "o", "ç": "c" };
+    str = str.replace(/(([İIŞĞÜÇÖ]))/g, function(letter) { return letters[letter]; });
+    return str.toLowerCase();
+}
+
+function filterTable(tableId, searchInputId) {
+    var input = document.getElementById(searchInputId);
+    var filter = turkishToLowerCase(input.value);
+    var table = document.getElementById(tableId);
+    var tr = table.getElementsByTagName('tr');
+
+    for (var i = 0; i < tr.length; i++) {
+        var td = tr[i].getElementsByTagName('td')[3];
+        if (td) {
+            var txtValue = turkishToLowerCase(td.textContent || td.innerText);
+            if (txtValue.indexOf(filter) > -1) {
+                tr[i].style.display = '';
+            } else {
+                tr[i].style.display = 'none';
+            }
+        }
+    }
+}
+
+function filterByKategori() {
+    var select = document.getElementById('yasKategoriFiltre');
+    var filter = select.value.toUpperCase();
+    var table = document.getElementById('eklenen-sporcular');
+    var tr = table.getElementsByTagName('tr');
+
+    for (var i = 0; i < tr.length; i++) {
+        var td = tr[i].getElementsByTagName('td')[7];
+        if (td) {
+            var txtValue = td.textContent || td.innerText;
+            if (filter === "" || txtValue.toUpperCase() === filter) {
+                tr[i].style.display = '';
+            } else {
+                tr[i].style.display = 'none';
+            }
+        }
+    }
+}
+
+function filterByCinsiyet() {
+    var select = document.getElementById('cinsiyetFiltre');
+    var filter = select.value.toUpperCase();
+    var table = document.getElementById('sporcu-listesi');
+    var tr = table.getElementsByTagName('tr');
+
+    for (var i = 0; i < tr.length; i++) {
+        var td = tr[i].getElementsByTagName('td')[5];
+        if (td) {
+            var txtValue = td.textContent || td.innerText;
+            if (filter === "" || txtValue.toUpperCase() === filter) {
+                tr[i].style.display = '';
+            } else {
+                tr[i].style.display = 'none';
+            }
+        }
+    }
+}
+</script>
+
+<style>
+    .table thead th {
+        background-color: #343a40;
+        color: #fff;
+    }
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .col-name {
+        max-width: 150px; /* Ad Soyad sütununun genişliğini sınırlıyoruz */
+    }
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+    .alert-container {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+    }
+    .btn-custom {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        line-height: 1.25;
+    }
+    .eklenmis-sporcu {
+        position: relative;
+        background-color: #d3d3d3 !important;
+    }
+    .eklenmis-sporcu::after {
+        content: "Eklendi";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        z-index: 1;
+    }
+    .eklenmis-sporcu td {
+        position: relative;
+        z-index: 2;
+    }
+    @media (max-width: 768px) {
+        .row > .col-md-6 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .row > .col-md-6 .table-responsive {
+            width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}

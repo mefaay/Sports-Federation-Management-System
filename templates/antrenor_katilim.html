@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Antrenör Katılımı - {{ musabaka.musabaka_adi }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <img src="{{ url_for('static', filename='images/gsblogo.png') }}" alt="Sol Logo" class="img-fluid" style="height: 80px;">
+    <h2 style="max-width: 70%; word-wrap: break-word; word-break: break-word; text-align: center;">
+        {{ musabaka.musabaka_adi }}
+    </h2>
+    <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Sağ Logo" class="img-fluid" style="height: 80px;">
+</div>
+
+<div class="mb-4">
+    <h6>Antrenör Ekleme</h6>
+</div>
+
+
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Sıra</th>
+                <th>Fotoğraf</th>
+                <th>Adı ve Soyadı</th>
+                <th>Telefon</th>
+                <th>E-posta</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for antrenor in antrenorler %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>
+                    {% if antrenor.foto %}
+                    <img src="{{ url_for('static', filename='uploads/' + antrenor.foto) }}" alt="Antrenör Fotoğrafı" class="img-fluid rounded-circle" style="height: 50px; width: 50px;">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="img-fluid rounded-circle" style="height: 50px; width: 50px;">
+                    {% endif %}
+                </td>
+                <td>{{ antrenor.ad_soyad }}</td>
+                <td>{{ antrenor.telefon }}</td>
+                <td>{{ antrenor.eposta }}</td>
+                <td>
+                    <form action="{{ url_for('ekle_antrenor', musabaka_id=musabaka.id) }}" method="post">
+                        <input type="hidden" name="antrenor_id" value="{{ antrenor.id }}">
+                        <button type="submit" class="btn btn-success btn-sm">Müsabakaya Ekle</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

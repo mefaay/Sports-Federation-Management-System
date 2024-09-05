@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Spor Dalları ve Sonuç Türleri{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-12">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Spor Dalları</h2>
+            <a href="{{ url_for('spor_dali_ekle') }}" class="btn btn-success mb-3">Yeni Spor Dalı Ekle</a>
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Spor Dalı Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spor_dali in spor_dallari %}
+                    <tr>
+                        <td>{{ spor_dali.id }}</td>
+                        <td>{{ spor_dali.dal_adi }}</td>
+                        <td>
+                            <a href="{{ url_for('spor_dali_duzenle', id=spor_dali.id) }}" class="btn btn-warning btn-sm">Düzenle</a>
+                            <a href="{{ url_for('spor_dali_sil', id=spor_dali.id) }}" class="btn btn-danger btn-sm">Sil</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h2>Sonuç Türleri</h2>
+            <a href="{{ url_for('sonuc_turu_ekle') }}" class="btn btn-success mb-3">Yeni Sonuç Türü Ekle</a>
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Sonuç Türü Adı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sonuc_turu in sonuc_turleri %}
+                    <tr>
+                        <td>{{ sonuc_turu.id }}</td>
+                        <td>{{ sonuc_turu.tur_adi }}</td>
+                        <td>
+                            <a href="{{ url_for('sonuc_turu_duzenle', id=sonuc_turu.id) }}" class="btn btn-warning btn-sm">Düzenle</a>
+                            <a href="{{ url_for('sonuc_turu_sil', id=sonuc_turu.id) }}" class="btn btn-danger btn-sm">Sil</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

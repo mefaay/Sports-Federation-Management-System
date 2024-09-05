@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    input[type='text'] {
+        width: 80px; /* Genişliği 80px olarak ayarla */
+    }
+    .sporcu-adi {
+        width: 250px;
+        max-width: 250px; /* Maksimum genişlik */
+        word-wrap: break-word; /* Uzun metinleri satır sonunda kır */
+    }
+</style>
+
+<h1>{{ musabaka.musabaka_adi }} Sonuç Girişi</h1>
+
+<!-- Kategori ve Cinsiyet Seçicileri için HTML -->
+<select id="kategoriSecici">
+    <option value="all">Tüm Kategoriler</option>
+    {% set yas_kategori_siralama = ["U9", "U11", "U13", "U15", "U17", "U19", "GENÇLER", "BÜYÜKLER", "MASTER +30", "MASTER +40", "MASTER +50", "MASTER +60", "MASTER +70", "MASTER +80"] %}
+    {% for yas_kategori_adi in yas_kategori_siralama %}
+    <option value="{{ yas_kategori_adi }}">{{ yas_kategori_adi }}</option>
+    {% endfor %}
+</select>
+
+<select id="cinsiyetSecici">
+    <option value="all">Her İki Cinsiyet</option>
+    <option value="Kadın">Kadın</option>
+    <option value="Erkek">Erkek</option>
+</select>
+
+<button id="filtreleBtn">Filtrele</button>
+
+<div id="checkbox-container" style="display: flex; flex-wrap: wrap;">
+    {% for sonuc_turu in brans.sonuc_turleri %}
+        <div style="margin-right: 10px;">
+            <input type="checkbox" id="checkbox-{{ sonuc_turu.id }}" class="column-toggle" checked>
+            <label for="checkbox-{{ sonuc_turu.id }}">{{ sonuc_turu.tur_adi }}</label>
+        </div>
+    {% endfor %}
+</div>
+
+<form method="POST" action="{{ url_for('musabaka_sonuclari_gir', musabaka_id=musabaka.id) }}">
+    {% set yas_kategori_siralama = ["U9", "U11", "U13", "U15", "U17", "U19", "GENÇLER", "BÜYÜKLER", "MASTER +30", "MASTER +40", "MASTER +50", "MASTER +60", "MASTER +70", "MASTER +80"] %}
+    {% set cinsiyet_siralama = ["Kadın", "Erkek"] %}
+    {% for yas_kategori_adi in yas_kategori_siralama %}
+        {% for cinsiyet in cinsiyet_siralama %}
+            {% set kategori_sporculari = katilimcilar | selectattr('yas_kategori.yas_kategori_adi', 'equalto', yas_kategori_adi) | selectattr('sporcu.cinsiyet', 'equalto', cinsiyet) | list %}
+            {% if kategori_sporculari %}
+                <h2>{{ yas_kategori_adi }} {{ cinsiyet }}</h2>
+                <table data-kategori="{{ yas_kategori_adi }}" data-cinsiyet="{{ cinsiyet }}">
+                    <thead>
+                        <tr>
+                            <th>Sporcu</th>
+                            {% for sonuc_turu in brans.sonuc_turleri %}
+                            <th class="column-header column-{{ sonuc_turu.id }}">{{ sonuc_turu.tur_adi }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for katilimci in kategori_sporculari %}
+                        <tr>
+                            <td class="sporcu-adi">{{ katilimci.sporcu.ad_soyad }}</td>
+                            {% for sonuc_turu in brans.sonuc_turleri %}
+                            <td class="column-{{ sonuc_turu.id }} result-cell">
+                                <input type="text" name="{{ sonuc_turu.id }}_{{ katilimci.sporcu.id }}"
+                                       value="{{ mevcut_sonuclar.get(katilimci.sporcu.id, {}).get(sonuc_turu.id, '') }}">
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    <button type="submit">Sonuçları Kaydet</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filtreleBtn = document.getElementById('filtreleBtn');
+    filtreleBtn.addEventListener('click', function() {
+        const secilenKategori = document.getElementById('kategoriSecici').value;
+        const secilenCinsiyet = document.getElementById('cinsiyetSecici').value;
+
+        // İlk olarak, tüm h2 başlıklarını ve tabloları gizleyin
+        document.querySelectorAll('h2, table').forEach(function(element) {
+            element.style.display = 'none';
+        });
+
+        // Seçilen kategori ve cinsiyete göre sadece ilgili tabloyu ve başlığı göster
+        document.querySelectorAll('table[data-kategori][data-cinsiyet]').forEach(function(table) {
+            const kategori = table.getAttribute('data-kategori');
+            const cinsiyet = table.getAttribute('data-cinsiyet');
+            if ((secilenKategori === 'all' || secilenKategori === kategori) && 
+                (secilenCinsiyet === 'all' || secilenCinsiyet === cinsiyet)) {
+                // İlgili tabloyu göster
+                table.style.display = 'table';
+                
+                // İlgili h2 başlığını bul ve göster
+                let previousElement = table.previousElementSibling;
+                while(previousElement && previousElement.tagName !== 'H2') {
+                    previousElement = previousElement.previousElementSibling;
+                }
+                if(previousElement && previousElement.tagName === 'H2') {
+                    previousElement.style.display = 'block';
+                }
+            }
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Checkboxları dinle ve ilgili sütunları göster/gizle
+    document.querySelectorAll(".column-toggle").forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const columnId = this.id.split('-')[1];
+            const columns = document.querySelectorAll('.column-' + columnId);
+            const columnHeader = document.getElementById('column-' + columnId);
+            if (checkbox.checked) {
+                columns.forEach(function(column) {
+                    column.style.display = 'table-cell';
+                });
+                columnHeader.style.display = 'table-cell'; // Sütun başlığını göster
+            } else {
+                columns.forEach(function(column) {
+                    column.style.display = 'none';
+                });
+                columnHeader.style.display = 'none'; // Sütun başlığını gizle
+            }
+        });
+    });
+
+    // Sayfa yüklendiğinde, seçili sütunları gizle
+    document.querySelectorAll(".column-toggle").forEach(function(checkbox) {
+        if (!checkbox.checked) {
+            const columnId = checkbox.id.split('-')[1];
+            const columns = document.querySelectorAll('.column-' + columnId);
+            const columnHeader = document.getElementById('column-' + columnId);
+            columns.forEach(function(column) {
+                column.style.display = 'none';
+            });
+            columnHeader.style.display = 'none'; // Sütun başlığını gizle
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Belirli kolonların toplamlarını TP'ye ekle ve TP'yi güncelle
+    document.querySelectorAll("input[type='text']").forEach(function(input) {
+        if (input.name.match(/^(2|6|8|12)_(\d+)$/)) {  // Bu kolonlar LRR, SwR, OCP gibi olanları temsil eder
+            input.addEventListener('input', function() {
+                const row = input.closest('tr');
+                let total = calculateTotalForRow(row);
+                
+                const tpInput = row.querySelector("input[name^='13_']");  // 13_ TP kolonunu temsil eder
+                if (tpInput) {
+                    // Eğer toplam bir tam sayıysa ondalık kısmı gösterme
+                    tpInput.value = total % 1 === 0 ? total.toString() : total.toFixed(2);
+                    // TP güncellendikten sonra sıralamayı tekrar yap
+                    calculateTPandSetOrder();
+                }
+            });
+        }
+    });
+
+    function calculateTotalForRow(row) {
+        let total = 0;
+        row.querySelectorAll("input[type='text']").forEach(inp => {
+            if (inp.name.match(/^(2|6|8|12)_(\d+)$/)) {  // LRR, SwR, OCP gibi olanları topla
+                const value = parseFloat(inp.value) || 0;
+                total += value;
+            }
+        });
+        return total;
+    }
+
+    function parseTimeToSeconds(timeStr) {
+        // Zaman formatını (MM:SS,SS) saniyeye çevir
+        const parts = timeStr.split(':');
+        if (parts.length === 2) {
+            const minutes = parseFloat(parts[0]) || 0;
+            const seconds = parseFloat(parts[1].replace(',', '.')) || 0;
+            return (minutes * 60) + seconds;
+        }
+        return null;
+    }
+
+    function calculateTPandSetOrder() {
+        // Her kategori bloğunu dolaş
+        document.querySelectorAll('h2').forEach(function(header) {
+            const categoryTable = header.nextElementSibling; // Kategori başlığından sonraki table elemanı
+            const categoryRows = categoryTable.querySelectorAll('tbody tr');
+
+            const values = [];
+
+            // Her sporcu için TP, rank değerlerini ve durumları topla
+            categoryRows.forEach(function(row, index) {
+                const inputs = row.querySelectorAll('input[type="text"]');
+                let tp = null;
+                let rank = null;
+                let status = ''; // EL, DNS, DSQ gibi durumlar için
+                
+                inputs.forEach(function(input) {
+                    if (input.name.startsWith('13_')) { // 13_ TP değerini temsil ediyor
+                        tp = parseFloat(input.value) || null;
+                    }
+                    if (input.name.startsWith('14_')) { // 14_ Rank değerini temsil ediyor
+                        rank = input.value ? parseTimeToSeconds(input.value) : null;
+                        if (input.value === 'EL' || input.value === 'DNS' || input.value === 'DSQ') {
+                            status = input.value;
+                        }
+                    }
+                });
+
+                values.push({ index, tp, rank, status });
+            });
+
+            values.sort(function(a, b) {
+                // Öncelikle TP değerlerine göre sıralama
+                if (a.tp !== null && b.tp !== null) {
+                    return b.tp - a.tp; // Büyükten küçüğe TP'ye göre sırala
+                } else if (a.tp !== null) {
+                    return -1; // Sadece a'nın TP değeri varsa, a'yı öne al
+                } else if (b.tp !== null) {
+                    return 1; // Sadece b'nin TP değeri varsa, b'yi öne al
+                }
+
+                // TP değerleri yoksa Rank değerlerine göre sıralama
+                if (a.rank !== null && b.rank !== null) {
+                    return a.rank - b.rank; // Küçükten büyüğe rank (zaman) değerine göre sırala
+                } else if (a.rank !== null) {
+                    return -1; // Sadece a'nın rank değeri varsa, a'yı öne al
+                } else if (b.rank !== null) {
+                    return 1; // Sadece b'nin rank değeri varsa, b'yi öne al
+                }
+
+                // Eğer ne TP ne de Rank varsa, duruma göre sıralama (EL, DNS, DSQ gibi)
+                const orderOfStatus = { 'EL': 1, 'DNS': 2, 'DSQ': 3, '': 4 }; // Özel durumlar ve boş değerler
+                const aStatus = orderOfStatus[a.status] || 4; // Boş değerler 4 olarak varsayılır
+                const bStatus = orderOfStatus[b.status] || 4;
+
+                return aStatus - bStatus; // Durumlara göre sıralama
+            });
+
+            // Order değerlerini güncelle
+            values.forEach(function(item, order) {
+                const orderInput = categoryRows[item.index].querySelector('input[name^="15_"]'); // 15_ Order değerini temsil ediyor
+                if (orderInput) {
+                    orderInput.value = order + 1; // 1'den başlayarak Order değerini ata
+                }
+            });
+        });
+    }
+
+    calculateTPandSetOrder(); // Sayfa yüklendiğinde sıralamayı başlat
+
+    // TP veya rank değerlerindeki her değişiklikte fonksiyonu tekrar çağır
+    document.querySelectorAll('input[type="text"]').forEach(function(input) {
+        input.addEventListener('input', calculateTPandSetOrder);
+    });
+});
+</script>
+
+{% endblock %}
+
