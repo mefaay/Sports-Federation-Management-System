@@ -229,32 +229,37 @@ def before_request():
 
     if user_id:
         kullanici = db.session.get(Kullanici, user_id)
-        kullanici_adi = kullanici.kullanici_adi
-        kullanici_rol = kullanici.rol.name
 
-        online_kullanici = OnlineKullanici.query.filter_by(kullanici_id=user_id).first()
-        if online_kullanici:
-            online_kullanici.son_aktif_zaman = now
-            online_kullanici.son_url = current_url
+        if kullanici is not None:
+            kullanici_adi = kullanici.kullanici_adi
+            kullanici_rol = kullanici.rol.name
+
+            online_kullanici = OnlineKullanici.query.filter_by(kullanici_id=user_id).first()
+            if online_kullanici:
+                online_kullanici.son_aktif_zaman = now
+                online_kullanici.son_url = current_url
+            else:
+                online_kullanici = OnlineKullanici(kullanici_id=user_id, son_aktif_zaman=now, son_url=current_url)
+                db.session.add(online_kullanici)
+
+            if not current_url.startswith('/static'):
+                kullanici_gecmis = KullaniciGecmis(kullanici_id=user_id, url=current_url, zaman=now,
+                                                   ip_adresi=ip_adresi)
+                db.session.add(kullanici_gecmis)
+
+            try:
+                db.session.commit()
+                if not current_url.startswith(('/static', '/favicon.ico')):
+                    app.logger.info(
+                        f"Kullanıcı durumu güncellendi. "
+                        f"Kullanıcı Adı: {kullanici_adi}, Rol: {kullanici_rol}, "
+                        f"Son Aktif Zaman: {now}, Son URL: {current_url}"
+                    )
+            except Exception as e:
+                db.session.rollback()
+                app.logger.error(f"Veritabanı hatası: {str(e)}")
         else:
-            online_kullanici = OnlineKullanici(kullanici_id=user_id, son_aktif_zaman=now, son_url=current_url)
-            db.session.add(online_kullanici)
-
-        if not current_url.startswith('/static'):
-            kullanici_gecmis = KullaniciGecmis(kullanici_id=user_id, url=current_url, zaman=now, ip_adresi=ip_adresi)
-            db.session.add(kullanici_gecmis)
-
-        try:
-            db.session.commit()
-            if not current_url.startswith(('/static', '/favicon.ico')):
-                app.logger.info(
-                    f"Kullanıcı durumu güncellendi. "
-                    f"Kullanıcı Adı: {kullanici_adi}, Rol: {kullanici_rol}, "
-                    f"Son Aktif Zaman: {now}, Son URL: {current_url}"
-                )
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(f"Veritabanı hatası: {str(e)}")
+            app.logger.warning(f"Kullanıcı bulunamadı. User ID: {user_id}")
     else:
         if not current_url.startswith('/static'):
             oturum_acmamiss_kullanici = OturumAcmaYetkisiOlmayan.query.filter_by(ip_adresi=ip_adresi).first()
@@ -275,6 +280,9 @@ def online_kullanicilar():
     online_kullanicilar_list = OnlineKullanici.query.options(
         joinedload(OnlineKullanici.kullanici)
     ).order_by(OnlineKullanici.son_aktif_zaman.desc()).all()
+
+    # online.kullanici None olan kayıtları filtrele
+    online_kullanicilar_list = [online for online in online_kullanicilar_list if online.kullanici is not None]
 
     oturum_acmamiss_kullanicilar_list = OturumAcmaYetkisiOlmayan.query.order_by(
         OturumAcmaYetkisiOlmayan.zaman.desc()
@@ -3600,7 +3608,7 @@ def hakem_basvuru_listesi():
 
     # İşlemi yapacak kullanıcı "Yönetici" veya MHK üyesi ise, işleme devam et
     hakem_basvurulari = HakemBasvuru.query.all()
-    print(hakem_basvurulari)  # Bu satır, hakem_basvurulari değişkeninin içeriğini yazdıracaktır.
+    app.logger.info(hakem_basvurulari)
     return render_template('hakem_basvuru_listesi.html', hakem_basvurulari=hakem_basvurulari)
 
 
