@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="author" content="Mehmet Faruk AYDIN">
+    <meta name="publisher" content="Mefaay Technology">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müsabakalar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    text-align: center;
+    padding: 20px;
+    background-color: #34495e;
+    color: white;
+}
+
+.header h1 {
+    color: #e74c3c;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.menu {
+    padding: 15px;
+    display: flex;
+    justify-content: space-around;
+    background-color: #2c3e50;
+}
+
+.menu a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.menu a:hover {
+    color: #e67e22;
+}
+
+.content {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+.search-box {
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+#searchInput:focus {
+    border-color: #2980b9;
+    outline: none;
+}
+
+.active-matches {
+    flex: 2;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-right: 2px solid #ddd;
+}
+
+.date-selection {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.year-box {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.year-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.year-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.all-years {
+    text-decoration: none;
+    color: #2980b9;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.year-box ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.year-box ul li {
+    margin: 0;
+}
+
+.year-box ul li a {
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #2980b9;
+    color: white;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    display: inline-block;
+    width: 100px;
+    text-align: center;
+}
+
+.year-box ul li a:hover {
+    background-color: #e74c3c;
+}
+
+.month-box {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.month-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.month-header a {
+    text-decoration: none;
+    color: #2980b9;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.month-box ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.month-box ul li {
+    margin: 0;
+}
+
+.month-box ul li a {
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #2980b9;
+    color: white;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    display: inline-block;
+    width: 100px;
+    text-align: center;
+}
+
+.month-box ul li a:hover {
+    background-color: #e74c3c;
+}
+
+#matchDetails {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+    display: none;
+}
+
+#backToYearSelection {
+    display: inline-block;
+    margin-left: 20px;
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.pagination {
+    justify-content: center;
+    margin-top: 20px; /* Sayfa numaralarını içeriğin altına yaklaştırır */
+    margin-bottom: 20px; /* Footer'a yaklaşmasını sağlar */
+}
+
+.page-item {
+    margin: 0 5px; /* Sayfa numaraları arasında küçük boşluklar oluşturur */
+}
+
+.footer {
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    left: 0;
+}
+
+.footer p {
+    margin: 0;
+}
+@media (max-width: 768px) {
+    .menu {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .menu a {
+        padding: 10px 0;
+    }
+
+    .content {
+        flex-direction: column-reverse;
+    }
+
+    .active-matches, .date-selection {
+        flex: none;
+        width: 100%;
+        border-right: none;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    .header {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .year-header, .month-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .year-box ul, .month-box ul {
+        justify-content: center;
+    }
+
+    .year-box ul li a, .month-box ul li a {
+        width: auto;
+        display: block;
+        text-align: left;
+    }
+
+    #matchDetails {
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .pagination {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .footer {
+        padding: 15px 0;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span>&#x1F3C6;</span> Müsabaka Listesi</h1>
+        </div>
+        <div class="menu">
+            <a href="login">FyS Giriş</a>
+<a href="https://tmpf.org.tr/" target="_blank">Web Sitemiz</a>
+            <a href="#">Duyurular</a>
+
+<a href="https://wa.me/908503464657?text=Merhaba%2C%20start%20listesi%20ve%20sonuç%20için%20yardıma%20ihtiyacım%20var." target="_blank">Destek</a>
+        </div>
+        <div class="content">
+            <div class="active-matches">
+                <div id="müsabakaListesi">
+                    {% for musabaka in musabakalar %}
+                        <div class="card" onclick="showMatchDetails({{ musabaka.id }})">
+                            <div class="card-body">
+                                <div>
+                                    <strong>{{ musabaka.musabaka_adi }}</strong><br>
+                                    <span>Tarih: {{ musabaka.baslama_tarihi.strftime('%d/%m/%Y') }} - {{ musabaka.bitis_tarihi.strftime('%d/%m/%Y') }}</span><br>
+                                    <span>Şehir: {{ musabaka.il }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <nav>
+                    <ul class="pagination">
+                        {% for page_num in range(1, total_pages + 1) %}
+                            <li class="page-item {% if page_num == page %}active{% endif %}">
+                                <a class="page-link" href="?page={{ page_num }}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_month %}&month={{ selected_month }}{% endif %}">{{ page_num }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+<div class="date-selection"><div class="search-box">
+    <input type="text" id="searchInput" class="form-control" placeholder="Şehir veya Müsabaka Adı...">
+</div>
+
+ <div class="year-box" id="yearBox">
+    <div class="year-header">
+        <h3>Yıl Seçimi</h3>
+        <a href="?year=all" class="all-years">Tüm Yıllar</a>
+    </div>
+    <ul>
+        {% for year in year_list %}
+            <li><a href="#" onclick="updateMonths('{{ year }}')">{{ year }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+  <div class="month-box" id="monthBox" style="display: none;">
+    <div class="month-header">
+        <h3>Ay Seçimi</h3>
+        <div>
+            <a href="#" onclick="updateMonths('{{ selected_year }}', 'all')">Tüm Aylar</a>
+            <a id="backToYearSelection" href="#" onclick="showYearSelection()">Yıl Seçimine Dön</a>
+        </div>
+    </div>
+    <ul id="monthList">
+        <!-- Dinamik olarak aylar burada listelenecek -->
+    </ul>
+</div>
+    <div id="matchDetails">
+        <!-- Seçilen müsabaka detayları buraya yüklenecek -->
+    </div>
+</div>
+
+        </div>
+		<footer class="footer">
+    <div class="container">
+        <p class="text-center">© 2024 Mefaay Technology FyS v13 Tüm hakları saklıdır.</p>
+    </div>
+</footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        function updateMonths(year, month = null) {
+            var yearBox = document.getElementById("yearBox");
+            var monthBox = document.getElementById("monthBox");
+            var monthList = document.getElementById("monthList");
+
+            monthList.innerHTML = ''; // Mevcut ayları temizle
+            monthBox.style.display = 'block';
+            yearBox.style.display = 'none';
+
+            localStorage.setItem('selectedYear', year);
+
+            if (month === 'all') {
+                window.location.href = `?year=${year}&month=all`;
+            } else {
+               fetch(`/tum_musabakalar?year=${year}`, {
+    headers: {
+        'Accept': 'application/json'
+    }
+})
+.then(response => response.json())
+.then(data => {
+    data.months.forEach(month => {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = `?year=${year}&month=${month.month}`;
+        a.textContent = month.name;
+        li.appendChild(a);
+        monthList.appendChild(li);
+    });
+});
+            }
+        }
+
+        function showYearSelection() {
+            var yearBox = document.getElementById("yearBox");
+            var monthBox = document.getElementById("monthBox");
+
+            monthBox.style.display = 'none';
+            yearBox.style.display = 'block';
+
+            localStorage.removeItem('selectedYear');
+        }
+
+        function showMatchDetails(musabaka_id) {
+            fetch(`/get_match_details?id=${musabaka_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    var matchDetails = document.getElementById("matchDetails");
+                    matchDetails.style.display = "block";
+                    matchDetails.innerHTML = `
+                        <h4>${data.musabaka_adi}</h4>
+                        <p><strong>Tarih:</strong> ${data.baslama_tarihi} - ${data.bitis_tarihi}</p>
+                        <p><strong>Şehir:</strong> ${data.il}</p>
+                        <p><strong>Kadın Sporcu:</strong> ${data.kadin_sporcu_sayisi}</p>
+                        <p><strong>Erkek Sporcu:</strong> ${data.erkek_sporcu_sayisi}</p>
+                        <p><strong>Toplam Sporcu:</strong> ${data.kayitli_sporcu_sayisi}</p>
+                        <p><strong>Kulüp Sayısı:</strong> ${data.kulup_sayisi}</p>
+                        <div class="text-end">
+                            <a href="#" class="btn btn-warning" onclick="checkStartList(${musabaka_id})">Start Listesi</a>
+                            <a href="#" class="btn btn-primary" onclick="checkResults(${musabaka_id})">Sonuçlar</a>
+                        </div>
+                    `;
+                });
+        }
+
+function checkStartList(musabaka_id) {
+    fetch(`/check_start_list_status/${musabaka_id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ready') {
+                window.location.href = `/kontrol_listesi?musabaka_id=${musabaka_id}`;
+            } else {
+                alert('Bu müsabaka için start listesi henüz yayınlanmadı.');
+            }
+        });
+}
+
+
+function checkResults(musabaka_id) {
+    fetch(`/check_results_status/${musabaka_id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ready') {
+                window.location.href = `/musabaka/${musabaka_id}/sonuclar`;
+            } else {
+                alert('Bu müsabaka için sonuçlar henüz yayınlanmadı.');
+            }
+        });
+}
+
+        window.onload = function() {
+            var selectedYear = localStorage.getItem('selectedYear');
+            if (selectedYear) {
+                updateMonths(selectedYear);
+            }
+        }
+		function normalizeText(text) {
+    const charMap = {
+        'ı': 'i', 'i': 'ı',
+        'ü': 'u', 'u': 'ü',
+        'ö': 'o', 'o': 'ö',
+        'ş': 's', 's': 'ş',
+        'ç': 'c', 'c': 'ç',
+        'ğ': 'g', 'g': 'ğ'
+    };
+
+    return text.toLowerCase().split('').map(char => charMap[char] || char).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const query = normalizeText(this.value);
+    const musabakaListesi = document.getElementById('müsabakaListesi');
+    const cards = musabakaListesi.querySelectorAll('.card');
+
+    cards.forEach(function (card) {
+        const musabakaAdi = normalizeText(card.querySelector('strong').textContent);
+        const sehirAdi = normalizeText(card.querySelector('span:nth-of-type(2)').textContent);
+
+        if (musabakaAdi.includes(query) || sehirAdi.includes(query)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

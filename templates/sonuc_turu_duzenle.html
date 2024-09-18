@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Sonuç Türü Düzenle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Sonuç Türü Düzenle</h2>
+    <form action="{{ url_for('sonuc_turu_duzenle', id=sonuc_turu.id) }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+
+        <div class="form-group">
+            <label for="sonucTuruAdi">Sonuç Türü Adı:</label>
+            <input type="text" class="form-control" id="sonucTuruAdi" name="sonuc_turu_adi" value="{{ sonuc_turu.tur_adi }}" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+    </form>
+</div>
+{% endblock %}

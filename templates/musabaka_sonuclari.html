@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Yazar Bilgileri -->
+    <meta name="author" content="Mehmet Faruk AYDIN">
+    <meta name="publisher" content="Mefaay Technology">
+    <title>{{ musabaka.musabaka_adi }} Sonuçları</title>
+    <style>
+        /* Tablo ve resimler için bazı temel stiller */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        img {
+            width: 100px; /* Logoların genişliğini ayarlayın */
+            height: auto; /* Otomatik yükseklik ayarı */
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .logo-left, .logo-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-left {
+            justify-content: flex-start;
+        }
+        .logo-right {
+            justify-content: flex-end;
+        }
+        .title-container {
+            flex: 2;
+            text-align: center;
+            word-wrap: break-word;
+        }
+		
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 5px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+        /* Buton Stilleri */
+        .print-button {
+            display: block; /* Blok seviyesinde bir eleman olarak ayarla */
+            width: 200px; /* Genişlik */
+            margin: 20px auto; /* Üstte ve altta 20px boşluk ve otomatik yan marjlar */
+            padding: 10px; /* İç boşluk */
+            text-align: center; /* Metni ortala */
+            background-color: #4CAF50; /* Arka plan rengi */
+            color: white; /* Metin rengi */
+            font-size: 16px; /* Yazı tipi boyutu */
+            border: none; /* Kenarlık kaldır */
+            border-radius: 5px; /* Kenar yuvarlaklığı */
+            cursor: pointer; /* İmleci işaretçi olarak ayarla */
+        }
+
+        /* Butona fare ile üzerine gelindiğinde uygulanacak stil */
+        .print-button:hover {
+            background-color: #45a049;
+        }
+        /* Arama Kutusu Stilleri */
+        #searchInput {
+            width: 60%; /* Genişliği ayarla */
+            padding: 10px 20px; /* İç boşluk */
+            margin: 20px auto; /* Otomatik marj ile ortala */
+            font-size: 16px; /* Yazı tipi boyutu */
+            border: 1px solid #ddd; /* Kenarlık stilini ayarla */
+            border-radius: 5px; /* Köşeleri yuvarlak yap */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Gölge ekle */
+            display: block; /* Blok seviyesinde görüntüle */
+        }
+
+        /* Arama Kutusu Odaklandığında Stiller */
+        #searchInput:focus {
+            outline: none; /* Odaklandığında dış çizgiyi kaldır */
+            border-color: #4CAF50; /* Kenarlık rengini değiştir */
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); /* Gölgeyi güçlendir */
+        }
+
+        /* Arama İkonu (Opsiyonel) */
+        .search-icon {
+            position: absolute;
+            right: 30px;
+            top: 35px;
+            color: #666;
+        }
+        @media print {
+            /* Yazdırma sırasında gizlenecek öğeler */
+            #searchInput, .print-button, #ageCategorySelect, #genderSelect {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <!-- Yaş Kategorisi için Listbox -->
+            <select id="ageCategorySelect" onchange="enableGenderSelect()">
+                <option value="">Tüm Yaş Kategorileri</option>
+                {% for yas_kategori, _ in sonuclar_filtered.keys() %}
+                    <option value="{{ yas_kategori }}">{{ yas_kategori }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Cinsiyet için Listbox, başlangıçta devre dışı -->
+            <select id="genderSelect" onchange="filterResults()" disabled>
+                <option value="">Cinsiyet Seç</option>
+                <option value="Kadın">Kadın</option>
+                <option value="Erkek">Erkek</option>
+            </select>
+        </div>
+        <div class="logo-container">
+            <div class="logo logo-left">
+                <img src="{{ url_for('static', filename='images/gsblogo.png') }}" alt="GSB Logo">
+            </div>
+            <div class="title-container">
+                <h1>{{ musabaka.musabaka_adi }}</h1>
+                <p>Tarih: {{ musabaka.baslama_tarihi.strftime('%d/%m/%Y') }} - {{ musabaka.bitis_tarihi.strftime('%d/%m/%Y') }}</p>
+                <p>Şehir: {{ musabaka.il }}</p>
+            </div>
+            <div class="logo logo-right">
+                <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="TMPF Logo">
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <!-- Sonuçları göstermek için döngüler -->
+    {% for yas_kategori, cinsiyet in sonuclar_filtered.keys() %}
+        <div class="category-container">
+            <center><h4>Kategori: {{ yas_kategori }} {{ cinsiyet }}</h4></center>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Fotoğraf</th>
+                        <th>Sporcu Adı</th>
+                        <th>Doğum Yılı</th>
+                        <th>Cinsiyet</th>
+                        <th>Yaş Kategorisi</th>
+                        <th>Kulüp</th>
+                        <th>Sonuç</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sporcu_verisi in sonuclar_filtered[yas_kategori, cinsiyet] %}
+                        <tr>
+                            <td>{{ sporcu_verisi['ilk_sonuc_15'] }}</td>
+                            <td>
+                                <img src="{{ url_for('static', filename='uploads/' + (sporcu_verisi['sporcu'].foto if sporcu_verisi['sporcu'].foto else 'default.jpg')) }}" style="width: 50px; height: 50px;">
+                            </td>
+                            <td>{{ sporcu_verisi['sporcu'].ad_soyad }}</td>
+                            <td>{{ sporcu_verisi['sporcu'].dogum_tarihi.strftime('%Y') if sporcu_verisi['sporcu'].dogum_tarihi else 'Bilgi Yok' }}</td>
+                            <td>{{ sporcu_verisi['sporcu'].cinsiyet }}</td>
+                            <td>{{ sporcu_verisi['yas_kategori'].yas_kategori_adi if sporcu_verisi['yas_kategori'] else 'Bilgi Yok' }}</td>
+                            <td class="uppercase">
+                                {% if sporcu_verisi.sporcu.kulup %}
+                                    <img src="{{ url_for('static', filename='uploads/' + sporcu_verisi.sporcu.kulup.logo_url) }}" alt="{{ sporcu_verisi.sporcu.kulup.kulup_adi }}" style="width: 50px; height: 50px;">
+                                    {{ sporcu_verisi.sporcu.kulup.kulup_adi|replace('SPOR KULÜBÜ', 'S.K.') }}
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Ferdi Sporcu" style="width: 50px; height: 50px;">
+                                    {{ sporcu_verisi.sporcu.il|upper }} FERDİ SPORCU
+                                {% endif %}
+                            </td>
+                            <td>
+                                <table class="sonuc-ic-tablo">
+                                    <tr>
+                                        {% for sonuc in sporcu_verisi['sonuclar'] %}
+                                            {% if sonuc.sonucturu.id != 15 %}
+                                                <th class="sonuc-baslik">{{ sonuc.sonucturu.tur_adi }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        {% for sonuc in sporcu_verisi['sonuclar'] %}
+                                            {% if sonuc.sonucturu.id != 15 %}
+                                                <td class="sonuc-deger">{{ sonuc.deger }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+	
+    <!-- Yazdır butonu -->
+    <button class="print-button" onclick="printPage()">Yazdır</button>
+
+    <script>
+        function printPage() {
+            window.print();
+        }
+    </script>
+   
+    <script>
+        function enableGenderSelect() {
+            // Yaş kategorisi seçildiğinde cinsiyet seçimini etkinleştir
+            var ageSelect = document.getElementById("ageCategorySelect");
+            var genderSelect = document.getElementById("genderSelect");
+            if(ageSelect.value) {
+                genderSelect.disabled = false;
+            } else {
+                genderSelect.disabled = true;
+            }
+            filterResults(); // Cinsiyet seçimi etkinleştirildiğinde filtreleme yap
+        }
+
+        function filterResults() {
+            var selectedAgeCategory = document.getElementById("ageCategorySelect").value;
+            var selectedGender = document.getElementById("genderSelect").value;
+            var containers = document.getElementsByClassName("category-container");
+
+            Array.from(containers).forEach(function(container) {
+                var categoryTitle = container.getElementsByTagName("h4")[0].textContent;
+                var ageDisplay = !selectedAgeCategory || categoryTitle.includes(selectedAgeCategory);
+                var genderDisplay = !selectedGender || categoryTitle.includes(selectedGender);
+
+                container.style.display = (ageDisplay && genderDisplay) ? "" : "none";
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Yaş kategorilerini ve cinsiyet seçimini işle
+            processAgeCategoriesAndEnableGenderFilter();
+            filterResults(); // İlk yüklemede filtreleme yap
+        });
+
+        function processAgeCategoriesAndEnableGenderFilter() {
+            // Öncelikle cinsiyet seçimini etkinleştir
+            document.getElementById("genderSelect").disabled = false;
+
+            // Yaş kategorilerini benzersiz olarak işle ve listele
+            var ageCategorySelect = document.getElementById('ageCategorySelect');
+            var seenCategories = new Set();
+            var options = ageCategorySelect.querySelectorAll('option');
+
+            options.forEach(function(option) {
+                if (option.value && !seenCategories.has(option.value)) {
+                    seenCategories.add(option.value);
+                } else if (option.value) {
+                    // Eğer kategori zaten eklenmişse, kaldır
+                    ageCategorySelect.removeChild(option);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

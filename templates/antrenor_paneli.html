@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Antrenör Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Kartlar -->
+    <div class="row">
+        <!-- Sporcu Sayısı Kartı -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Sporcu Sayısı</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ sporcu_sayisi }}</div>
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Antrenör Sayısı Kartı -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Antrenör Sayısı</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ kulup_antrenor_sayisi }}</div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Müsabaka Sayısı Kartı -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Katıldığınız Müsabaka Sayısı</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ musabaka_sayisi }}</div>
+                    <div class="icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="row">
+    <!-- Antrenör Bilgileri -->
+
+<div class="col-lg-6">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <center><h5 class="m-0 font-weight-bold">Antrenör Bilgileri</h5></center>
+        </div>
+        <div class="card-body">
+            <div class="text-center">
+{% if antrenor_bilgileri.foto %}
+    <img src="{{ url_for('static', filename='uploads/' + antrenor_bilgileri.foto) }}" alt="{{ antrenor_bilgileri.ad_soyad }}" class="img-thumbnail" style="max-width: 225px;">
+{% else %}
+    <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" height="225px" width="225px">
+{% endif %}
+            </div>
+            <p><strong>Ad Soyad:</strong> {{ antrenor_bilgileri.ad_soyad }}</p>
+            <p><strong>TC Kimlik Numarası:</strong> {{ antrenor_bilgileri.tc_kimlik_no }}</p>
+            <p><strong>Telefon:</strong> {{ antrenor_bilgileri.telefon }}</p>
+            <p><strong>E-posta:</strong> {{ antrenor_bilgileri.eposta }}</p>
+        </div>
+    </div>
+</div>
+
+
+    
+    <!-- Duyurular -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <center><h5 class="m-0 font-weight-bold">Duyurular</h5></center>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for duyuru in duyurular %}
+                    <li class="list-group-item">
+                        <h5>{{ duyuru.baslik }}</h5>
+                        <p>{{ duyuru.icerik | truncate(100) }}</p>
+                        <small>Yayınlanma Tarihi: {{ duyuru.yayinlanma_tarihi.strftime('%d/%m/%Y') }}</small>
+                        <p><a href="{{ url_for('duyuru_detay', duyuru_id=duyuru.id) }}" class="btn btn-primary btn-sm">Detaylar</a>
+                    </li>
+                    {% endfor %}
+                </ul><p><p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Yaklaşan Müsabakalar -->
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <center><h4 class="m-0 font-weight-bold">Yaklaşan Müsabakalar</h4></center>
+            </div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+                    <thead>
+                        <tr>
+                            <th>Müsabaka Adı</th>
+                            <th>Disiplin</th>
+                            <th>Başlama ve Bitiş Tarihi</th>
+                            <th>Kayıt Başlama ve Bitiş Tarihi</th>
+                            <th>Konum</th>
+                            <!-- Diğer sütunlar -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for musabaka in yaklasan_musabakalar %}
+                        <tr>
+                            <td>{{ musabaka.musabaka_adi }}</td>
+                            <td>
+							 <!-- Disipline göre dinamik ikon yolu -->
+                                <img src="{{ url_for('static', filename='images/' + musabaka.brans.brans_adi|lower + '.png') }}" alt="{{ musabaka.brans.brans_adi }}" style="height: 30px;">
+							{{ musabaka.brans.brans_adi }}
+							</td>
+                            <td class="text-primary">{{ musabaka.baslama_tarihi.strftime('%d-%m-%Y') }} - {{ musabaka.bitis_tarihi.strftime('%d-%m-%Y') }}</td>
+                            <td class="text-danger">{{ musabaka.katilimci_ekleme_baslangic_tarihi.strftime('%d-%m-%Y') }} - {{ musabaka.katilimci_ekleme_bitis_tarihi.strftime('%d-%m-%Y') }}</td>
+                            <td>{{ musabaka.il }}</td>
+                            <!-- Diğer bilgiler -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

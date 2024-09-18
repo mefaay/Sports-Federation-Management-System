@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}Kulüp Detayı{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0;
+        background: linear-gradient(to right, #1e3c72, #2a5298);
+        color: white;
+        padding: 15px;
+    }
+
+    .card-header h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .btn-sm {
+        padding: 8px 12px;
+        border-radius: 50px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-sm:hover {
+        transform: scale(1.05);
+    }
+
+    .table th {
+        font-weight: bold;
+        color: #343a40;
+        border-top: none;
+    }
+
+    .table td {
+        color: #6c757d;
+    }
+
+    .img-fluid {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-tabs .nav-link {
+        border-radius: 50px;
+        background-color: #f8f9fa;
+        margin-right: 10px;
+        color: #007bff;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .nav-tabs .nav-link:hover {
+        background-color: #e2e6ea;
+    }
+
+    .tab-content h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* Mobil uyumluluk */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+
+        .img-fluid {
+            width: 100px;
+            height: 100px;
+        }
+
+        .table th, .table td {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            font-size: 0.875rem;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .tab-content h2 {
+            font-size: 1.25rem;
+            text-align: center;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table-responsive .table th,
+        .table-responsive .table td {
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="font-weight-bold">Kulüp Bilgileri</h2>
+            {% if session['role'] in ['Kulup', 'Yonetici'] %}
+                <div>
+                    <a href="{{ url_for('kulup_guncelle', kulup_id=kulup.id) }}" class="btn btn-warning btn-sm">Bilgileri Güncelle</a>
+                    <a href="{{ url_for('kullanici_guncelle', id=kulup.kullanici_id) }}" class="btn btn-success btn-sm">Şifre Güncelle</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+<img src="{{ url_for('static', filename='uploads/' + kulup.logo_url) }}" alt="{{ kulup.kulup_adi }} Logosu" class="img-fluid shadow-sm border border-secondary" style="width: 200px; height: 200px;">
+                </div>
+                <div class="col-md-8">
+                    <table class="table table-hover mt-3">
+                        <tbody>
+                            <tr>
+                                <th scope="row" class="text-primary">Kulüp Adı</th>
+                                <td>{{ kulup.kulup_adi }}</td>
+                            </tr>
+                            {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+                            <tr>
+                                <th scope="row" class="text-primary">Kütük No</th>
+                                <td>{{ kulup.kutuk_no }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th scope="row" class="text-primary">IBAN</th>
+                                <td>{{ kulup.iban }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-primary">Yetkili Adı</th>
+                                <td>{{ kulup.baskan_adi }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-primary">Telefon</th>
+                                <td>{{ kulup.telefon }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-primary">Eposta</th>
+                                <td>{{ kulup.eposta }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-primary">Adres</th>
+                                <td>{{ kulup.adres }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-primary">İl</th>
+                                <td>{{ kulup.il }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+    <div class="mt-4">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="sporcular-tab" data-bs-toggle="tab" data-bs-target="#sporcular" type="button" role="tab" aria-controls="sporcular" aria-selected="true">Sporcular</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="antrenorler-tab" data-bs-toggle="tab" data-bs-target="#antrenorler" type="button" role="tab" aria-controls="antrenorler" aria-selected="false">Antrenörler</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="musabakalar-tab" data-bs-toggle="tab" data-bs-target="#musabakalar" type="button" role="tab" aria-controls="musabakalar" aria-selected="false">Müsabakalar</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="sporcular" role="tabpanel" aria-labelledby="sporcular-tab">
+                <div class="table-responsive mt-2">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Foto</th>
+                                {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+                                <th scope="col">TC No</th>
+                                {% endif %}
+                                <th scope="col">Ad Soyad</th>
+                                <th scope="col">Doğum Tarihi</th>
+                                <th scope="col">Cinsiyet</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sporcu in sporcular %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>
+                                    {% if sporcu.foto %}
+                                    <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="{{ sporcu.ad_soyad }}" class="img-fluid rounded" height="50" width="50">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="img-fluid rounded" height="50" width="50">
+                                    {% endif %}
+                                </td>
+                                {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+                                <td>{{ sporcu.tc_no }}</td>
+                                {% endif %}
+                                <td>{{ sporcu.ad_soyad }}</td>
+                                <td>{{ sporcu.dogum_tarihi.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ sporcu.cinsiyet }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="antrenorler" role="tabpanel" aria-labelledby="antrenorler-tab">
+                <div class="table-responsive mt-2">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Foto</th>
+                                {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+                                <th scope="col">TC No</th>
+                                {% endif %}
+                                <th scope="col">Ad Soyad</th>
+                                <th scope="col">Telefon</th>
+                                <th scope="col">Eposta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for antrenor in antrenorler %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>
+                                    {% if antrenor.foto %}
+                                    <img src="{{ url_for('static', filename='uploads/' + antrenor.foto) }}" alt="{{ antrenor.ad_soyad }}" class="img-fluid rounded" height="50" width="50">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="img-fluid rounded" height="50" width="50">
+                                    {% endif %}
+                                </td>
+                                {% if session['role'] in ['Kulup', 'Yonetici', 'IlTemsilcisi'] %}
+                                <td>{{ antrenor.tc_kimlik_no }}</td>
+                                {% endif %}
+                                <td>{{ antrenor.ad_soyad }}</td>
+                                <td>{{ antrenor.telefon }}</td>
+                                <td>{{ antrenor.eposta }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="musabakalar" role="tabpanel" aria-labelledby="musabakalar-tab">
+                <div class="table-responsive mt-2">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Müsabaka Adı</th>
+                                <th scope="col">Başlama Tarihi</th>
+                                <th scope="col">Bitiş Tarihi</th>
+                                <th scope="col">Katılan Sporcular</th>
+                                <th scope="col">Katılan Antrenörler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for musabaka in musabakalar %}
+                            <tr>
+                                <td>{{ musabaka.musabaka_adi }}</td>
+                                <td>{{ musabaka.baslama_tarihi }}</td>
+                                <td>{{ musabaka.bitis_tarihi }}</td>
+                                <td>
+                                    {% for sporcu in musabaka.katilan_sporcular %}
+                                    {{ sporcu.ad_soyad }}
+                                    {% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for antrenor in musabaka.katilan_antrenorler %}
+                                    {{ antrenor.ad_soyad }}
+                                    {% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

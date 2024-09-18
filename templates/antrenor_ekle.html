@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Antrenör Ekle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white rounded-top">
+            <h3 class="mb-0">Antrenör Ekle</h3>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data">
+                <!-- CSRF Token -->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                <input type="hidden" id="kulupId" name="kulup_id" value="{{ kulup_id }}">
+
+                <div class="mb-4">
+                    <label for="foto" class="form-label">Fotoğraf</label>
+                    <input type="file" class="form-control p-2" id="foto" name="foto" accept="image/*" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="adSoyad" class="form-label">Ad Soyad</label>
+                    <input type="text" class="form-control p-3" id="adSoyad" name="ad_soyad" required placeholder="Adınızı ve Soyadınızı Giriniz">
+                </div>
+
+                <div class="mb-4">
+                    <label for="tcKimlikNo" class="form-label">T.C. Kimlik No</label>
+                    <input type="text" class="form-control p-3" id="tcKimlikNo" name="tc_kimlik_no" required pattern="\d{11}" maxlength="11" title="11 haneli T.C. Kimlik No giriniz." placeholder="11 Haneli T.C. Kimlik No">
+                </div>
+
+                <div class="mb-4">
+                    <label for="telefon" class="form-label">Telefon</label>
+                    <input type="tel" class="form-control p-3" id="telefon" name="telefon" required pattern="^[0-9]+$" title="Lütfen sadece sayı giriniz." placeholder="Telefon Numaranızı Giriniz">
+                </div>
+
+                <div class="mb-4">
+                    <label for="eposta" class="form-label">E-posta</label>
+                    <input type="email" class="form-control p-3" id="eposta" name="eposta" required placeholder="E-posta Adresinizi Giriniz">
+                </div>
+
+                <div class="mb-4">
+                    <label for="adres" class="form-label">Adres</label>
+                    <textarea class="form-control p-3" id="adres" name="adres" rows="3" required placeholder="Adresinizi Giriniz"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="kullaniciAdi" class="form-label">Kullanıcı Adı</label>
+                    <input type="text" class="form-control p-3" id="kullaniciAdi" name="kullanici_adi" required pattern="^[a-zA-Z0-9_.]+$" title="Kullanıcı adı sadece İngilizce harfler, sayılar, alt çizgi ve nokta içerebilir." placeholder="Kullanıcı Adınızı Belirleyin">
+                </div>
+
+                <div class="mb-4">
+                    <label for="sifre" class="form-label">Şifre</label>
+                    <input type="password" class="form-control p-3" id="sifre" name="sifre" required pattern="^\S+$" title="Şifre boşluk içeremez." placeholder="Şifrenizi Giriniz">
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-dark btn-lg">Ekle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #4a90e2, #007bff);
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-dark {
+        background: linear-gradient(135deg, #343a40, #000);
+        border: none;
+    }
+
+    .btn-dark:hover {
+        background: linear-gradient(135deg, #000, #343a40);
+    }
+</style>
+{% endblock %}

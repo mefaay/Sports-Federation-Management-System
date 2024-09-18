@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Görevli Hakemler{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>{{ musabaka.musabaka_adi }} için Görevli Hakemler</h4>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover shadow-sm">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Sıra No</th>
+                    <th>Foto</th>
+                    <th>Ad Soyad</th>
+                    <th>Derece</th>
+                    <th>İl</th>
+                    <th>Görevden Kaldır</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hakem in hakemler %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>
+                        <img src="{{ url_for('static', filename='uploads/' + hakem.foto) }}" alt="Hakem Fotoğrafı" class="img-fluid rounded-circle shadow-sm" style="width: 100px; height: 100px;">
+                    </td>
+                    <td>{{ hakem.ad_soyad }}</td>
+                    <td>{{ hakem.derece }}</td>
+                    <td>{{ hakem.il }}</td>
+                    <td>
+                        <form action="{{ url_for('hakem_gorevden_kaldir', musabaka_id=musabaka.id, hakem_id=hakem.id) }}" method="post">
+                            <input type="submit" value="Görevden Kaldır" class="btn btn-danger btn-sm">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

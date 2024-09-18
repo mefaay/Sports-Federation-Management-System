@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Kulüp Güncelle{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+<div class="card-header text-white rounded-top" style="background: linear-gradient(135deg, #4a90e2, #007bff);">
+            <h3 class="mb-0">Kulüp Güncelle</h3>
+        </div>
+        <div class="card-body p-5">
+            <form action="{{ url_for('kulup_guncelle', kulup_id=kulup.id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                
+                {% for message in get_flashed_messages() %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                <!-- Mevcut logo gösterimi -->
+                <div class="form-group mb-4 text-center">
+                    <label for="mevcutLogo" class="form-label">Mevcut Logo:</label>
+                    <div>
+                        {% if kulup.logo_url %}
+                            <img src="{{ url_for('static', filename='uploads/' + kulup.logo_url) }}" alt="{{ kulup.kulup_adi }} Logosu" class="img-fluid mt-3" style="max-width: 200px;">
+                        {% else %}
+                            <p>Logo bulunamadı.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Logo yükleme alanı -->
+                <div class="form-group mb-4">
+                    <label for="logo" class="form-label">Yeni Logo Yükle (opsiyonel):</label>
+                    <input type="file" class="form-control p-2" id="logo" name="logo">
+                </div>
+
+                <!-- Kulüp bilgileri -->
+                <div class="form-group mb-4">
+                    <label for="kulupAdi" class="form-label">Kulüp Adı:</label>
+                    <input type="text" class="form-control p-3" id="kulupAdi" name="kulup_adi" value="{{ kulup.kulup_adi }}" readonly required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="kutukNo" class="form-label">Kütük No:</label>
+                    <input type="text" class="form-control p-3" id="kutukNo" name="kutuk_no" value="{{ kulup.kutuk_no }}" readonly>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="baskanAdi" class="form-label">Yetkili Adı:</label>
+                    <input type="text" class="form-control p-3" id="baskanAdi" name="baskan_adi" value="{{ kulup.baskan_adi }}">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="telefon" class="form-label">Telefon:</label>
+                    <input type="tel" class="form-control p-3" id="telefon" name="telefon" value="{{ kulup.telefon }}">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="eposta" class="form-label">Eposta:</label>
+                    <input type="email" class="form-control p-3" id="eposta" name="eposta" value="{{ kulup.eposta }}">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="iban" class="form-label">IBAN:</label>
+                    <input type="text" class="form-control p-3" id="iban" name="iban" value="{{ kulup.iban }}" 
+                           {% if session['role'] != 'Yonetici' %}readonly{% endif %}>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="adres" class="form-label">Adres:</label>
+                    <textarea class="form-control p-3" id="adres" name="adres" rows="3">{{ kulup.adres }}</textarea>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="il" class="form-label">İl:</label>
+                    <input type="text" class="form-control p-3" id="il" name="il" value="{{ kulup.il }}" readonly>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 p-3 rounded-pill">Güncelle</button>
+            </form>
+
+            <div class="alert alert-info mt-4 rounded">
+                <p>Bazı bilgilerin değiştirilmesi sadece federasyonumuz bilgisi dahilinde değiştirileceğinden dolayı engellenmiştir. Kulüp Adı, Kütük Numarası, IBAN ve İl Değişikliği için Federasyon Başkanlığımız ile iletişime geçmelisiniz.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    /* Tepe kısmı için açık renk */
+    .card-header {
+        background: linear-gradient(135deg, #ffffff, #e0e0e0); /* Beyazdan griye geçiş */
+        color: #333; /* Yazı rengini koyu yaparak okunabilirliği artırın */
+    }
+
+    /* Form elemanları için */
+    .form-control, .form-select {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    /* Alt kısımdaki buton için açık renk */
+    .btn-dark {
+        background: linear-gradient(135deg, #ffffff, #cccccc); /* Beyazdan açık griye geçiş */
+        border: none;
+        color: #333; /* Yazı rengini koyu yaparak butonun üzerine yazıyı görünür kılın */
+    }
+
+    .btn-dark:hover {
+        background: linear-gradient(135deg, #e0e0e0, #bfbfbf); /* Hover durumunda biraz daha koyu tonlar */
+    }
+</style>
+
+{% endblock %}

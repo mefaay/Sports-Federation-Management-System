@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Start Listesi{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-12">
+    <!-- Müsabaka Seçimi ve Excel'e Aktar Butonu -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" action="{{ url_for('start_listesi') }}">
+                <div class="input-group">
+                    <select class="form-select" name="musabaka_id" onchange="this.form.submit()">
+                        <option value="">Müsabaka Seç</option>
+                        {% for musabaka in aktif_musabakalar %}
+                            <option value="{{ musabaka.id }}" {% if secili_musabaka and musabaka.id == secili_musabaka.id %}selected{% endif %}>
+                                {{ musabaka.musabaka_adi }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary" type="submit">Seç</button>
+                </div>
+            </form>
+        </div>
+        {% if session['role'] in ['Yonetici'] %}
+            <div class="col-md-6 d-flex justify-content-end">
+                <!-- Excel'e Aktar Butonu -->
+                {% if secili_musabaka %}
+                    <a href="{{ url_for('export_to_excel', musabaka_id=secili_musabaka.id) }}" class="btn btn-primary">Excel'e Aktar</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Müsabaka Adı, Logo ve Yer -->
+    <div class="row mb-4">
+        <div class="col text-center">
+            <img src="{{ url_for('static', filename='images/gsblogo.png') }}" alt="Logo" height="100">
+        </div>
+        <div class="col text-center">
+            {% if secili_musabaka %}
+                <h5>{{ secili_musabaka.musabaka_adi }}</h5>
+                <p>{{ secili_musabaka.baslama_tarihi.strftime('%d/%m/%Y') }} - {{ secili_musabaka.bitis_tarihi.strftime('%d/%m/%Y') }}</p>
+                <p>{{ secili_musabaka.il }}</p>
+            {% else %}
+                <h5>Aktif Müsabaka Yok</h5>
+                <p>Müsabaka bilgileri bulunamadı.</p>
+            {% endif %}
+        </div>
+        <div class="col text-center">
+            <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Logo" height="100">
+        </div>
+    </div>
+
+    <!-- Sporcuların Gruplandırılmış Listesi -->
+    {% if secili_musabaka %}
+        {% for yas_kategori_adi, cinsiyetler in gruplanmis_katilimcilar.items() %}
+            {% for cinsiyet, sporcular in cinsiyetler.items() %}
+                {% if sporcular %}
+                    <h4 class="mb-3 text-center">{{ yas_kategori_adi }} - {{ cinsiyet }}</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sıra</th>
+                                    <th>Fotoğraf</th>
+									<th>T.C.</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Doğum Tarihi</th>
+                                    <th>Cinsiyet</th>
+                                    <th>Yaş Kategorisi</th>
+                                    <th>Kulübü/İli</th>
+                                    <th>Derece</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for katilimci in sporcular %}
+                                    <tr>
+                                        <th scope="row">{{ loop.index }}</th>
+                                        <td>
+                                            {% if katilimci.sporcu.foto %}
+                                                <img src="{{ url_for('static', filename='uploads/' + katilimci.sporcu.foto) }}" alt="{{ katilimci.sporcu.ad_soyad }}" height="50" width="50">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="No Image" height="50" style="max-width: 50;">
+                                            {% endif %}
+                                        </td>
+										<td class="uppercase">{{ katilimci.sporcu.tc_no }}</td>
+                                        <td class="uppercase">{{ katilimci.sporcu.ad_soyad }}</td>
+                                        <td>{{ katilimci.sporcu.dogum_tarihi.strftime('%d/%m/%Y') if katilimci.sporcu.dogum_tarihi else 'Bilinmiyor' }}</td>
+                                        <td>{{ katilimci.sporcu.cinsiyet }}</td>
+                                        <td>{{ yas_kategori_adi }}</td>
+                                        <td class="uppercase">
+                                            {% if katilimci.sporcu.kulup %}
+                                                {{ katilimci.sporcu.kulup.kulup_adi|replace('SPOR KULÜBÜ', 'S.K.') }}
+                                            {% else %}
+                                                {{ katilimci.sporcu.il }} Ferdi Sporcu
+                                            {% endif %}
+                                        </td>
+<td>
+    {% if katilimci.derece %}
+        {{ katilimci.derece }}
+    {% else %}
+        No Time
+    {% endif %}
+</td>
+
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Seçili aktif müsabaka bulunamadı veya başlatılmadı.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

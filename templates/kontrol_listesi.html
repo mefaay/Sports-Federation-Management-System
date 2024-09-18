@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontrol Listesi</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Yazar Bilgileri -->
+    <meta name="author" content="Mehmet Faruk AYDIN">
+    <meta name="publisher" content="Mefaay Technology">
+</head>
+<body>
+<div class="container-fluid mt-4">
+
+    <!-- Müsabaka Adı, Logo ve Yer -->
+    <div class="row mb-4">
+        <div class="col text-center">
+            <img src="{{ url_for('static', filename='images/gsblogo.png') }}" alt="Logo" height="100">
+        </div>
+        <div class="col text-center">
+            {% if secili_musabaka %}
+                <h5>{{ secili_musabaka.musabaka_adi }}</h5>
+                <p>{{ secili_musabaka.baslama_tarihi.strftime('%d/%m/%Y') }} - {{ secili_musabaka.bitis_tarihi.strftime('%d/%m/%Y') }}</p>
+                <p>{{ secili_musabaka.il }}</p>
+            {% else %}
+                <h5>Kontrol Listesi Henüz Yayınlanmamıştır</h5>
+                <p>Müsabaka bilgileri bulunamadı.</p>
+            {% endif %}
+        </div>
+        <div class="col text-center">
+            <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Logo" height="100">
+        </div>
+    </div>
+
+    <!-- Katılımcılar Tabloları -->
+    {% if secili_musabaka %}
+        {% for yas_kategori, cinsiyetler in gruplanmis_katilimcilar.items() %}
+            {% for cinsiyet, katilimcilar in cinsiyetler.items() %}
+                <h5 class="text-center">{{ yas_kategori }} - {{ cinsiyet }}</h5> <!-- Cinsiyet başlığı -->
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sıra</th>
+                                <th>Fotoğraf</th>
+                                <th>Ad Soyad</th>
+                                <th>Doğum Yılı</th>
+                                <th>Cinsiyet</th>
+                                <th>Yaş Kategorisi</th>
+                                <th>Kulübü/İli</th>
+                                <th>Derece</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for katilimci in katilimcilar %}
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>
+                                        {% if katilimci.sporcu.foto %}
+                                            <img src="{{ url_for('static', filename='uploads/' + katilimci.sporcu.foto) }}" alt="{{ katilimci.sporcu.ad_soyad }}" height="50" width="50">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="No Image" height="50" style="max-width: 50;">
+                                        {% endif %}
+                                    </td>
+                                    <td class="uppercase">{{ katilimci.sporcu.ad_soyad }}</td>
+                                    <td>{{ katilimci.sporcu.dogum_tarihi.strftime('%Y') if katilimci.sporcu.dogum_tarihi else 'Bilinmiyor' }}</td>
+                                    <td>{{ katilimci.sporcu.cinsiyet }}</td>
+                                    <td>{{ yas_kategori }}</td>
+                                    <td class="uppercase">
+                                        {% if katilimci.sporcu.kulup %}
+                                            <!-- Kulübün logosunu göster -->
+                                            <img src="{{ url_for('static', filename='uploads/' + katilimci.sporcu.kulup.logo_url) }}" alt="{{ katilimci.sporcu.kulup.kulup_adi }}" style="width: 50px; height: 50px;">
+                                            <!-- Kulübün adını göster -->
+                                            {{ katilimci.sporcu.kulup.kulup_adi|replace('SPOR KULÜBÜ', 'S.K.') }}
+                                        {% else %}
+                                            <!-- Ferdi sporcu için standart logo -->
+                                            <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Ferdi Sporcu" style="width: 50px; height: 50px;">
+                                            {{ katilimci.sporcu.il|upper }} FERDİ SPORCU
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if katilimci.derece %}
+                                            {{ katilimci.derece }}
+                                        {% else %}
+                                            No Time
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <!-- Kontrol listesi yayınlanmamışsa veya seçili müsabaka yoksa uyarı mesajı -->
+        <div class="alert alert-warning text-center" role="alert">
+            Kontrol listesi yayınlanmamıştır veya seçili müsabaka bulunamamıştır.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

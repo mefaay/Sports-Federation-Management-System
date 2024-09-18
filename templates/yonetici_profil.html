@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Yönetici Detayı{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+           <!-- Yönetici Bilgileri -->
+            <h2>Yönetici Bilgileri</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Yönetici Fotoğrafı -->
+                    {% if yonetici.foto %}
+                        <img src="{{ url_for('static', filename='uploads/' + yonetici.foto) }}" alt="{{ yonetici.ad_soyad }}" class="img-thumbnail">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default_profile.png') }}" alt="Varsayılan Profil Fotoğrafı" class="img-thumbnail">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Ad Soyad</th>
+                                <td>{{ yonetici.ad_soyad }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Görevi</th>
+                                <td>{{ yonetici.gorevi }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Eposta</th>
+                                <td>{{ yonetici.eposta }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Telefon</th>
+                                <td>{{ yonetici.telefon }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Adres</th>
+                                <td>{{ yonetici.adres }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">İl</th>
+                                <td>{{ yonetici.il }}</td>
+                            </tr>
+                            <!-- Diğer yönetici bilgileri -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

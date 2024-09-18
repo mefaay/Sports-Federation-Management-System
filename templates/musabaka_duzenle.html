@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Müsabaka Düzenle{% endblock %}
+
+{% block content %}
+<style>
+/* Genel sayfa stili */
+body {
+    background-color: #f7f9fc;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Form genel stili */
+form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Form başlıkları */
+.form-label {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Giriş alanları stili */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+}
+
+/* Buton stili */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 50px;
+    font-size: 1rem;
+    padding: 0.75rem;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 86, 179, 0.4);
+}
+
+/* Mobil uyumlu düzen */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        font-size: 1.1rem;
+    }
+}
+
+</style>
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Müsabaka Düzenle</h2>
+    <form action="{{ url_for('musabaka_duzenle', musabaka_id=musabaka.id) }}" method="post" class="bg-white p-4 shadow-sm rounded">
+        <!-- CSRF koruması için token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        
+        <!-- Müsabaka adı -->
+        <div class="form-group mb-3">
+            <label for="musabaka_adi" class="form-label">Müsabaka Adı:</label>
+            <input type="text" class="form-control" name="musabaka_adi" id="musabaka_adi" value="{{ musabaka.musabaka_adi }}" required>
+        </div>
+        
+        <!-- Başlama ve bitiş tarihleri -->
+        <div class="row">
+            <div class="col-md-6 form-group mb-3">
+                <label for="baslama_tarihi" class="form-label">Başlama Tarihi:</label>
+                <input type="date" class="form-control" name="baslama_tarihi" id="baslama_tarihi" value="{{ musabaka.baslama_tarihi.strftime('%Y-%m-%d') if musabaka.baslama_tarihi else '' }}" required>
+            </div>
+            <div class="col-md-6 form-group mb-3">
+                <label for="bitis_tarihi" class="form-label">Bitiş Tarihi:</label>
+                <input type="date" class="form-control" name="bitis_tarihi" id="bitis_tarihi" value="{{ musabaka.bitis_tarihi.strftime('%Y-%m-%d') if musabaka.bitis_tarihi else '' }}">
+            </div>
+        </div>
+        
+        <!-- İl -->
+        <div class="form-group mb-3">
+            <label for="il" class="form-label">İl:</label>
+            <input type="text" class="form-control" name="il" id="il" value="{{ musabaka.il }}">
+        </div>
+        
+        <!-- Katılımcı ekleme tarihleri -->
+        <div class="row">
+            <div class="col-md-6 form-group mb-3">
+                <label for="katilimci_ekleme_baslangic_tarihi" class="form-label">Katılımcı Ekleme Başlangıç Tarihi:</label>
+                <input type="date" class="form-control" name="katilimci_ekleme_baslangic_tarihi" id="katilimci_ekleme_baslangic_tarihi" value="{{ musabaka.katilimci_ekleme_baslangic_tarihi.strftime('%Y-%m-%d') if musabaka.katilimci_ekleme_baslangic_tarihi else '' }}">
+            </div>
+            <div class="col-md-6 form-group mb-3">
+                <label for="katilimci_ekleme_bitis_tarihi" class="form-label">Katılımcı Ekleme Bitiş Tarihi:</label>
+                <input type="date" class="form-control" name="katilimci_ekleme_bitis_tarihi" id="katilimci_ekleme_bitis_tarihi" value="{{ musabaka.katilimci_ekleme_bitis_tarihi.strftime('%Y-%m-%d') if musabaka.katilimci_ekleme_bitis_tarihi else '' }}">
+            </div>
+        </div>
+
+        <!-- Branş -->
+        <div class="form-group mb-3">
+            <label for="brans_id" class="form-label">Branş:</label>
+            <select class="form-control" name="brans_id" id="brans_id">
+                {% for brans in branslar %}
+                <option value="{{ brans.id }}" {% if brans.id == musabaka.brans_id %}selected{% endif %}>{{ brans.brans_adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Yaş Kategorisi -->
+        <div class="form-group mb-4">
+            <label for="yasKategorileri" class="form-label">Yaş Kategorileri:</label>
+            <div id="yasKategorileri" class="row">
+                {% for yas_kategori in yas_kategorileri %}
+                <div class="col-md-6 col-lg-4 form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="yas_kategori_id[]" value="{{ yas_kategori.id }}" id="yasKategori{{ yas_kategori.id }}"
+                    {% if yas_kategori.id in musabaka_yas_kategori_idleri %} checked {% endif %}>
+                    <label class="form-check-label" for="yasKategori{{ yas_kategori.id }}">
+                        {{ yas_kategori.yas_kategori_adi }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Düzenle butonu -->
+        <button type="submit" class="btn btn-primary w-100">Düzenle</button>
+    </form>
+</div>
+{% endblock %}

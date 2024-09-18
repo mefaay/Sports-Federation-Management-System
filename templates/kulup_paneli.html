@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Yönetici Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+<div class="table-responsive">
+    <!-- Kartlar -->
+    <div class="row">
+<!-- Sporcu Sayısı Kartı -->
+<div class="col-lg-4 mb-4">
+    <div class="card bg-info text-white shadow">
+        <div class="card-body">
+            <div class="text-xs font-weight-bold text-uppercase mb-1">Sporcu Sayısı</div>
+            <div class="h3 mb-0 font-weight-bold">{{ sporcu_sayisi }}</div>
+            <div class="icon">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Antrenör Sayısı Kartı -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Antrenör Sayısı</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ antrenor_sayisi }}</div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Müsabaka Sayısı Kartı -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Katıldığınız Müsabaka Sayısı</div>
+                    <div class="h3 mb-0 font-weight-bold">{{ musabaka_sayisi }}</div>
+                    <div class="icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Kulüp Bilgileri ve Duyurular -->
+    <div class="row">
+<!-- Kulüp Bilgileri -->                
+<div class="col-lg-6">
+    <div class="card shadow mb-4">
+        <!-- Kart Başlığı -->
+        <div class="card-header py-3">
+            <center><h5 class="m-0 font-weight-bold">Kulüp Bilgileri</h5></center>
+        </div>
+
+        <!-- Kart İçeriği -->
+        <div class="card-body">
+             <center>{% if kulup_bilgileri.logo_url %}
+                <img src="{{ url_for('static', filename='uploads/' + kulup_bilgileri.logo_url) }}" alt="{{ kulup_bilgileri.kulup_adi }} Logosu" class="img-fluid mb-3" style="max-height: 250px;">
+            {% else %}
+                <p class="text-muted">Logo bulunamadı.</p>
+            {% endif %}
+             </center>
+            <div class="text-left">
+                <p><strong>Kulüp Adı:</strong> {{ kulup_bilgileri.kulup_adi }}</p>
+                <p><strong>Kütük No:</strong> {{ kulup_bilgileri.kutuk_no }}</p>
+                <p><strong>Başkan Adı:</strong> {{ kulup_bilgileri.baskan_adi }}</p>
+                <p><strong>Telefon:</strong> {{ kulup_bilgileri.telefon }}</p>
+                <p><strong>E-posta:</strong> {{ kulup_bilgileri.eposta }}</p>
+                <p><strong>IBAN:</strong> {{ kulup_bilgileri.iban }}</p>
+                <p><strong>İl:</strong> {{ kulup_bilgileri.il }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+                
+
+<!-- Duyurular -->
+<div class="col-lg-6">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <center><h5 class="m-0 font-weight-bold">Duyurular</h5></center>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for duyuru in duyurular %}
+                <li class="list-group-item">
+                    <h5>{{ duyuru.baslik }}</h5>
+                    <p>{{ duyuru.icerik | truncate(100) }}</p>
+                    <small>Yayınlanma Tarihi: {{ duyuru.yayinlanma_tarihi.strftime('%d/%m/%Y') }}</small>
+                    <p><a href="{{ url_for('duyuru_detay', duyuru_id=duyuru.id) }}" class="btn btn-primary btn-sm">Detaylar</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Yaklaşan Müsabakalar -->
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <center><h4 class="m-0 font-weight-bold">Yaklaşan Müsabakalar</h4></center>
+            </div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+                    <thead>
+                        <tr>
+                            <th>Müsabaka Adı</th>
+                            <th>Disiplin</th>
+                            <th>Başlama ve Bitiş Tarihi</th>
+                            <th>Kayıt Başlama ve Bitiş Tarihi</th>
+                            <th>Konum</th>
+                            <!-- Diğer sütunlar -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for musabaka in yaklasan_musabakalar %}
+                        <tr>
+                            <td>{{ musabaka.musabaka_adi }}</td>
+                            <td>
+							 <!-- Disipline göre dinamik ikon yolu -->
+                                <img src="{{ url_for('static', filename='images/' + musabaka.brans.brans_adi|lower + '.png') }}" alt="{{ musabaka.brans.brans_adi }}" style="height: 30px;">
+							{{ musabaka.brans.brans_adi }}
+							</td>
+                            <td class="text-primary">{{ musabaka.baslama_tarihi.strftime('%d-%m-%Y') }} - {{ musabaka.bitis_tarihi.strftime('%d-%m-%Y') }}</td>
+                            <td class="text-danger">{{ musabaka.katilimci_ekleme_baslangic_tarihi.strftime('%d-%m-%Y') }} - {{ musabaka.katilimci_ekleme_bitis_tarihi.strftime('%d-%m-%Y') }}</td>
+                            <td>{{ musabaka.il }}</td>
+                            <!-- Diğer bilgiler -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div></div></div>
+{% endblock %}

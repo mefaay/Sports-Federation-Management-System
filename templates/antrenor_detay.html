@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Antrenör Detayı{% endblock %}
+
+{% block content %}
+<style>
+    /* Antrenör profil fotoğrafı için özel stil */
+    .profile-photo {
+        width: 100%;
+        height: auto;
+        max-height: 400px; /* Fotoğrafın maksimum yüksekliği */
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover; /* Resmin kırpılmasını sağlar */
+    }
+
+    /* Sporcu listesi fotoğrafları için özel stil */
+    .small-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%; /* Fotoğrafı daire şeklinde yapar */
+        object-fit: cover; /* Resmin kırpılmasını sağlar */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <!-- Antrenör Bilgileri ve Düzenleme Butonu -->
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Antrenör Bilgileri</h2>
+    <div>
+        <a href="{{ url_for('antrenor_duzenle', antrenor_id=antrenor.id) }}" class="btn btn-warning">Bilgileri Güncelle</a>
+        <!-- Şifre Güncelle Butonu -->
+        {% if antrenor.kullanici_id == session.get('user_id') or kulup.kullanici_id == session.get('user_id') or session.get('role') == 'Yonetici' %}
+            <a href="{{ url_for('kullanici_guncelle', id=antrenor.kullanici_id) }}" class="btn btn-success">Şifre Güncelle</a>
+        {% endif %}
+    </div>
+</div>
+
+
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <!-- Antrenör Fotoğrafı -->
+{% if antrenor.foto %}
+        <img src="{{ url_for('static', filename='uploads/' + antrenor.foto) }}" alt="{{ antrenor.ad_soyad }}" class="profile-photo">
+{% else %}
+        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="profile-photo">
+{% endif %}
+                </div>
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Ad Soyad</th>
+                                <td>{{ antrenor.ad_soyad }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">TC Kimlik No</th>
+                                <td>{{ antrenor.tc_kimlik_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Telefon</th>
+                                <td>{{ antrenor.telefon }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">E-posta</th>
+                                <td>{{ antrenor.eposta }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Adres</th>
+                                <td>{{ antrenor.adres }}</td>
+                            </tr>
+                            <!-- Diğer antrenör bilgileri -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <!-- Detaylar Sekmeleri -->
+    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="kulup-bilgileri-tab" data-bs-toggle="tab" data-bs-target="#kulup-bilgileri" type="button" role="tab" aria-controls="kulup-bilgileri" aria-selected="true">Kulüp Bilgileri</button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="sporcular-tab" data-bs-toggle="tab" data-bs-target="#sporcular" type="button" role="tab" aria-controls="sporcular" aria-selected="false">Sporcular</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="musabakalar-tab" data-bs-toggle="tab" data-bs-target="#musabakalar" type="button" role="tab" aria-controls="musabakalar" aria-selected="false">Müsabakalar</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+       <!-- Kulüp Bilgileri Sekmesi -->
+<div class="tab-pane fade show active" id="kulup-bilgileri" role="tabpanel" aria-labelledby="kulup-bilgileri-tab">
+    <div class="container mt-3">
+        <h3>Kulüp Bilgileri</h3>
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th scope="row">Kulüp Adı</th>
+                    <td>{{ kulup.kulup_adi }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Başkan</th>
+                    <td>{{ kulup.baskan_adi }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Telefon</th>
+                    <td>{{ kulup.telefon }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">E-posta</th>
+                    <td>{{ kulup.eposta }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Adres</th>
+                    <td>{{ kulup.adres }}</td>
+                </tr>
+                <!-- Diğer kulüp bilgileri -->
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Sporcular Sekmesi -->
+<div class="tab-pane fade" id="sporcular" role="tabpanel" aria-labelledby="sporcular-tab">
+    <!-- Kulübe kayıtlı sporcuların listesi -->
+    <table class="table">
+        <thead>
+            <tr>
+				<th scope="col">Sıra</th>			
+				<th scope="col">Fotoğraf</th>
+                <th scope="col">Ad Soyad</th>
+                <th scope="col">Lisans No</th>
+				<th scope="col">Doğum Tarihi</th>
+				<th scope="col">Cinsiyet</th>
+
+                <!-- Diğer başlıklar -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for sporcu in kulup_sporculari %}
+            <tr>
+			    <td>{{ loop.index }}</td> <!-- Sıra numarası --></td>
+                <td>
+{% if sporcu.foto %}
+        <img src="{{ url_for('static', filename='uploads/' + sporcu.foto) }}" alt="{{ sporcu.ad_soyad }}" class="small-photo">
+{% else %}
+        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="small-photo">
+{% endif %}
+
+                </td>
+                <td>{{ sporcu.ad_soyad }}</td>
+                <td>{{ sporcu.lisans_no }}</td>
+                <td>{{ sporcu.dogum_tarihi | date('%d/%m/%Y') }}</td>
+                <td>{{ sporcu.cinsiyet }}</td>
+
+                <!-- Diğer sporcu bilgileri -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Müsabakalar Sekmesi -->
+<div class="tab-pane fade" id="musabakalar" role="tabpanel" aria-labelledby="musabakalar-tab">
+    <!-- Antrenörün ilgili olduğu müsabakaların listesi -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Müsabaka Adı</th>
+                <th scope="col">Başlangıç Tarihi</th>
+                <th scope="col">Bitiş Tarihi</th>
+                <!-- Diğer başlıklar -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for musabaka in antrenor_musabakalari %}
+            <tr>
+                <td>{{ musabaka.musabaka_adi }}</td>
+                <td>{{ musabaka.baslama_tarihi.strftime('%d/%m/%Y') }}</td>
+                <td>{{ musabaka.bitis_tarihi.strftime('%d/%m/%Y') }}</td>
+                <!-- Diğer müsabaka bilgileri -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    </div>
+</div>
+{% endblock %}

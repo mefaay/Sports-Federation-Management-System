@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ kullanici.kullanici_adi }}'nin Geçmişi{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: #343a40;
+        }
+
+        .clear-history-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .clear-history-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+
+    <h2>{{ kullanici.kullanici_adi }}'nin Geçmişi</h2>
+    
+    <!-- Geçmişi Temizle Butonu -->
+    <form action="{{ url_for('kullanici_gecmis_temizle_view', kullanici_id=kullanici.id) }}" method="post" style="margin-bottom: 20px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="clear-history-button">Geçmişi Temizle</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Zaman</th>
+                <th>URL</th>
+                <th>IP Adresi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in gecmis %}
+                {% if not entry.url.startswith('/static') %}
+                <tr>
+                    <td>{{ entry.zaman }}</td>
+                    <td>{{ entry.url }}</td>
+                    <td>{{ entry.ip_adresi }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Müsabakaya Katılacak Sporcular ve Antrenörler{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Müsabaka Başlığı ve Logolar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <img src="{{ url_for('static', filename='images/gsblogo.png') }}" alt="Sol Logo" class="img-fluid" style="height: 80px;">
+        <h1 class="text-center" style="max-width: 70%; word-wrap: break-word; word-break: break-word;">
+            {{ musabaka.musabaka_adi }}
+        </h1>
+        <img src="{{ url_for('static', filename='images/tmpflogo.png') }}" alt="Sağ Logo" class="img-fluid" style="height: 80px;">
+    </div>
+
+    <!-- Sporcuların Listesi -->
+    <h4 class="mb-3">Sporcular</h4>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Sıra</th>
+                    <th>Fotoğraf</th>
+                    <th>Ad Soyad</th>
+                    {% if session['role'] in ['Yonetici'] %}
+                    <th>Kulüp</th>
+                    {% endif %}
+                    {% if session['role'] in ['Yonetici'] %}
+                    <th>T.C. Kimlik No</th>
+                    {% endif %}
+                    <th>Doğum Tarihi</th>
+                    <th>Cinsiyet</th>
+                    <th>Yaş Kategorisi</th>
+                    <th>Derece</th>
+                    {% if session['role'] in ['Yonetici', 'Kulup'] and musabaka.katilimci_ekleme_bitis_tarihi >= today %}
+                    <th>İşlem</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for katilimci in katilimci_sporcular %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>
+                        {% if katilimci.sporcu and katilimci.sporcu.foto %}
+                        <img src="{{ url_for('static', filename='uploads/' + katilimci.sporcu.foto) }}" alt="{{ katilimci.sporcu.ad_soyad }}" class="rounded-circle" height="50" width="50">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="rounded-circle" height="50" width="50">
+                        {% endif %}
+                    </td>
+                    <td class="text-uppercase">{{ katilimci.sporcu.ad_soyad }}</td>
+                    {% if session['role'] in ['Yonetici'] %}
+                    <td class="text-uppercase">
+                        {% if katilimci.sporcu.kulup %}
+                        {{ katilimci.sporcu.kulup.kulup_adi|replace('SPOR KULÜBÜ', 'S.K.') }}
+                        {% else %}
+                        {{ katilimci.sporcu.il }} Ferdi Sporcu
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                    {% if session['role'] in ['Yonetici'] %}
+                    <td>{{ katilimci.sporcu.tc_no }}</td>
+                    {% endif %}
+                    <td>
+                        {% if katilimci.sporcu and katilimci.sporcu.dogum_tarihi %}
+                        {{ katilimci.sporcu.dogum_tarihi.strftime('%Y') }}
+                        {% else %}
+                        Belirtilmemiş
+                        {% endif %}
+                    </td>
+                    <td>{{ katilimci.sporcu.cinsiyet }}</td>
+                    <td>{{ katilimci.yas_kategori.yas_kategori_adi }}</td>
+                    <td>{{ katilimci.derece or 'No Time' }}</td>
+                    {% if session['role'] in ['Yonetici', 'Kulup'] and musabaka.katilimci_ekleme_bitis_tarihi >= today %}
+                    <td>
+                        <!-- Kategori ve Derece Düzenle Butonu -->
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ loop.index }}">
+                            Kategori ve Derece Düzenle
+                        </button>
+                        <form action="{{ url_for('musabakadan_cikart', musabaka_id=musabaka.id, katilimci_id=katilimci.id) }}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Müsabakadan Çıkar</button>
+                        </form>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="editCategoryModal{{ loop.index }}" tabindex="-1" aria-labelledby="editCategoryModalLabel{{ loop.index }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editCategoryModalLabel{{ loop.index }}">Yaş Kategorisi ve Dereceyi Düzenle</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('update_category', katilimci_id=katilimci.id) }}" method="post">
+                                            <input type="hidden" name="musabaka_id" value="{{ musabaka.id }}">
+                                            <div class="mb-3">
+                                                <label for="yasKategoriSelect{{ loop.index }}" class="form-label">Yeni Yaş Kategorisi</label>
+                                                <select class="form-select" id="yasKategoriSelect{{ loop.index }}" name="yas_kategori_id" required>
+                                                    {% for kategori in yas_kategorileri %}
+                                                    <option value="{{ kategori.id }}" {% if kategori.id == katilimci.yas_kategori_id %}selected{% endif %}>
+                                                        {{ kategori.yas_kategori_adi }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="dereceInput{{ loop.index }}" class="form-label">Derece</label>
+                                                <input type="text" class="form-control" id="dereceInput{{ loop.index }}" name="derece" value="{{ katilimci.derece or '' }}">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center">Listelenecek sporcu yok.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if session['role'] in ['Yonetici', 'Kulup', 'Antrenor'] %}
+    <!-- Antrenörlerin Listesi -->
+    <h4 class="mb-3">Antrenörler</h4>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Sıra</th>
+                    <th>Fotoğraf</th>
+                    <th>Ad Soyad</th>
+                    <th>Telefon</th>
+                    <th>Eposta</th>
+                    {% if session['role'] in ['Yonetici'] %} <th>Kulüp</th>{% endif %}
+                    {% if session['role'] in ['Yonetici', 'Kulup'] and musabaka.katilimci_ekleme_bitis_tarihi >= today %}<th>İşlem</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for katilimci in katilimci_antrenorler %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>
+                        {% if katilimci.antrenor and katilimci.antrenor.foto %}
+                        <img src="{{ url_for('static', filename='uploads/' + katilimci.antrenor.foto) }}" alt="{{ katilimci.antrenor.ad_soyad }}" class="rounded-circle" height="50" width="50">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='varsayılan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="rounded-circle" height="50" width="50">
+                        {% endif %}
+                    </td>
+                    <td class="text-uppercase">{{ katilimci.antrenor.ad_soyad }}</td>
+                    <td class="text-uppercase">{{ katilimci.antrenor.telefon }}</td>
+                    <td>{{ katilimci.antrenor.eposta }}</td>
+                    {% if session['role'] in ['Yonetici'] %}<td>
+                        {% if katilimci.antrenor.kulup %}
+                        {{ katilimci.antrenor.kulup.kulup_adi }}
+                        {% else %}
+                        Kulüp bilgisi yok
+                        {% endif %}
+                    </td>{% endif %}
+                    {% if session['role'] in ['Yonetici', 'Kulup'] and musabaka.katilimci_ekleme_bitis_tarihi >= today %}
+                    <td>
+                        <form action="{{ url_for('musabakadan_cikart', musabaka_id=musabaka.id, katilimci_id=katilimci.id) }}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Müsabakadan Çıkar</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">Listelenecek antrenör yok.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

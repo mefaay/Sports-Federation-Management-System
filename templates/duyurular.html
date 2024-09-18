@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Duyurular{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white rounded-top d-flex justify-content-between align-items-center flex-wrap">
+        <h3 class="mb-0">Duyurular</h3>
+        {% if session['role'] in ['Yonetici'] %}
+        <a href="{{ url_for('duyuru_ekle') }}" class="btn btn-success ms-2">Duyuru Ekle</a>
+        {% endif %}
+    </div>
+    <div class="card-body p-4">
+        <div>
+            {% for duyuru, yazar_ad_soyad in duyurular_ve_yazarlar %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">{{ duyuru.baslik }}</h4>
+                    <p class="card-text">{{ duyuru.icerik | truncate(150) }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Yayınlanma Tarihi: {{ duyuru.yayinlanma_tarihi.strftime('%d/%m/%Y %H:%M') }} - Yazar: {{ yazar_ad_soyad }}
+                        </small>
+                    </p>
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('duyuru_detay', duyuru_id=duyuru.id) }}" class="btn btn-sm me-2" style="background-color: #ffc107; border: none; color: white;">Detaylar</a>
+                        {% if session['role'] in ['Yonetici'] %}
+                        <a href="{{ url_for('duyuru_guncelle', duyuru_id=duyuru.id) }}" class="btn btn-sm me-2" style="background-color: #007bff; border: none; color: white;">Güncelle</a>
+                        <form action="{{ url_for('duyuru_sil', duyuru_id=duyuru.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Duyuruyu silmek istediğinizden emin misiniz?');">Sil</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .card {
+        border-radius: 20px;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #4a90e2);
+        color: white;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .btn {
+        border-radius: 20px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+    .card-title {
+        font-weight: bold;
+        margin-bottom: 0.75rem;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .table img {
+        border-radius: 50%;
+    }
+
+    @media (max-width: 768px) {
+        .form-control {
+            margin-top: 10px;
+            max-width: 100%;
+        }
+
+        .table-responsive {
+            margin-bottom: 15px;
+        }
+
+        .d-flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .d-flex > a {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .d-flex > input, .d-flex > .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

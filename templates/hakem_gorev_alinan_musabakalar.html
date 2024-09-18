@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Görev Alınan Müsabakalar{% endblock %}
+
+{% block content %}
+<h1>Görev Alınan Müsabakalar</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Müsabaka Adı</th>
+                <th>Başlama Tarihi</th>
+                <th>Bitiş Tarihi</th>
+                <th>İl</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for musabaka in musabakalar %}
+            <tr>
+                <td>{{ musabaka.musabaka_adi }}</td>
+                <td>{{ musabaka.baslama_tarihi }}</td>
+                <td>{{ musabaka.bitis_tarihi }}</td>
+                <td>{{ musabaka.il }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

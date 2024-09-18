@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Hakem Detayı{% endblock %}
+
+{% block content %}
+<style>
+    /* Hakem profil fotoğrafı için özel stil */
+    .profile-photo {
+        width: 100%;
+        height: auto;
+        max-height: 400px; /* Fotoğrafın maksimum yüksekliği */
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover; /* Resmin kırpılmasını sağlar */
+    }
+
+    /* Küçük boyutlu fotoğraflar için genel stil */
+    .small-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%; /* Fotoğrafı daire şeklinde yapar */
+        object-fit: cover; /* Resmin kırpılmasını sağlar */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <!-- Hakem Bilgileri ve Düzenleme Butonu -->
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Hakem Bilgileri</h2>
+    <div>
+		<button class="btn btn-primary">Belge Yükle</button>
+        <a href="{{ url_for('hakem_duzenle', hakem_id=hakem.id) }}" class="btn btn-warning">Bilgi Güncelle</a>
+<a href="{{ url_for('kullanici_guncelle', id=hakem.kullanici_id) }}" class="btn btn-success">Şifre Güncelle</a>
+    </div>
+</div>
+
+
+            <div class="row mt-3">
+<div class="col-md-4">
+    <!-- Hakem Fotoğrafı -->
+    {% if hakem.foto %}
+        <img src="{{ url_for('static', filename='uploads/' + hakem.foto) }}" alt="{{ hakem.ad_soyad }}" class="profile-photo">
+    {% else %}
+        <img src="{{ url_for('static', filename='varsayilan_foto.jpg') }}" alt="Varsayılan Fotoğraf" class="profile-photo">
+    {% endif %}
+</div>
+
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+						                            <tr>
+                                <th scope="row">Derece</th>
+                                <td>{{ hakem.derece }}</td>
+                            </tr>
+							                            <tr>
+                                <th scope="row">Kütük No</th>
+                                <td>{{ hakem.kutuk_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Ad Soyad</th>
+                                <td class="uppercase">{{ hakem.ad_soyad }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">TC Kimlik No</th>
+                                <td>{{ hakem.tc_kimlik_no }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Doğum Tarihi</th>
+                                <td>{{ hakem.dogum_tarihi.strftime('%d/%m/%Y') if hakem.dogum_tarihi else 'Bilgi Yok' }}</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">Telefon</th>
+                                <td>{{ hakem.telefon }}</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">E-posta</th>
+                                <td>{{ hakem.eposta }}</td>
+                            </tr>
+							                            <tr>
+                                <th scope="row">IBAN</th>
+                                <td>{{ hakem.iban }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Adres</th>
+                                <td>{{ hakem.adres }}</td>
+                            </tr>
+							                            <tr>
+                                <th scope="row">İl</th>
+                                <td class="uppercase">{{ hakem.il }}</td>
+                            </tr>
+                            <tr> 
+							<th scope="row">İş yeri ve adresi</th>
+                                <td>{{ hakem.izin_adresi }}</td>
+                            </tr>
+<tr>
+    <th scope="row">MHK Üyesi Mi?</th>
+    <td>{{ 'Evet' if hakem.mhk_uyesi_mi else 'Hayır' }}</td>
+    <td>
+    {% if session['role'] in ['Yonetici'] %}
+            <a href="{{ url_for('mhk_uyesi_durumu_degistir', hakem_id=hakem.id) }}" class="btn btn-sm {{ 'btn-danger' if hakem.mhk_uyesi_mi else 'btn-success' }}">
+                {{ 'MHK Üyeliğini Kaldır' if hakem.mhk_uyesi_mi else 'MHK Üyesi Yap' }}
+            </a>
+        {% endif %}
+    </td>
+</tr>
+
+                            <!-- Diğer hakem bilgileri buraya eklenebilir -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detaylar Sekmeleri -->
+    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+        <!-- Müsabakalar Sekmesi -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="musabakalar-tab" data-bs-toggle="tab" data-bs-target="#musabakalar" type="button" role="tab" aria-controls="musabakalar" aria-selected="true">Müsabakalar</button>
+        </li>
+        <!-- Belgeler Sekmesi -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="belgeler-tab" data-bs-toggle="tab" data-bs-target="#belgeler" type="button" role="tab" aria-controls="belgeler" aria-selected="false">Belgeler</button>
+        </li>
+        <!-- Diğer sekmeler eklenebilir -->
+    </ul>
+
+    <!-- Sekme İçerikleri -->
+    <div class="tab-content" id="myTabContent">
+        <!-- Müsabakalar Sekmesi İçeriği -->
+        <div class="tab-pane fade show active" id="musabakalar" role="tabpanel" aria-labelledby="musabakalar-tab">
+            <h3 class="mt-2">Görev Alınan Müsabakalar</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+						<th scope="col">Sıra No</th>
+                        <th scope="col">Müsabaka Adı</th>
+                        <th scope="col">Başlama Tarihi</th>
+                        <th scope="col">Bitiş Tarihi</th>
+                        <!-- Diğer müsabaka başlıkları -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for musabaka in hakem_musabakalar %}
+                    <tr>
+						<td>{{ loop.index }}</td>
+                        <td>{{ musabaka.musabaka_adi }}</td>
+                        <td>{{ musabaka.baslama_tarihi.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ musabaka.bitis_tarihi.strftime('%d/%m/%Y') }}</td>
+                        <!-- Diğer müsabaka bilgileri -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+<!-- Belgeler Sekmesi İçeriği -->
+<div class="tab-pane fade" id="belgeler" role="tabpanel" aria-labelledby="belgeler-tab">
+    <h3>Belgeler</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Belge Tipi</th>
+                <th>Görüntüle</th>
+{% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+                <th>Sil</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for belge in hakem_belgeleri %}
+            <tr>
+                <td>{{ belge.belge_tipi }}</td>
+                <td>
+                    <!-- Bootstrap düğmesiyle görüntüle butonu -->
+                    <a href="{{ url_for('static', filename='hakembelge/' + belge.belge_yolu) }}" target="_blank" class="btn btn-primary btn-sm">Görüntüle</a>
+                </td>
+                <td>
+                    <!-- Silme butonunu sadece yönetici görebilsin -->
+{% if session['role'] in ['Yonetici'] or is_mhk_member(session['user_id']) %}
+                    <a href="{{ url_for('belge_sil', hakem_id=hakem.id, belge_id=belge.id) }}" class="btn btn-danger btn-sm">Sil</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Belge Yükleme Modalı -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadModalLabel">Belge Yükle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+<form action="{{ url_for('hakem_belge_yukle', hakem_id=hakem.id) }}" method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="belgeTipi" class="form-label">Belge Tipi</label>
+            <select class="form-select" id="belgeTipi" name="belge_tipi">
+              {% for tip in belge_tipleri %}
+                <option value="{{ tip }}">{{ tip }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="belgeDosya" class="form-label">Belge Dosyası</label>
+            <input type="file" class="form-control" id="belgeDosya" name="file" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Yükle</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var uploadButton = document.querySelector(".btn-primary");
+    var uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    
+    uploadButton.addEventListener('click', function () {
+      uploadModal.show();
+    });
+  });
+</script>
+
+{% endblock %}

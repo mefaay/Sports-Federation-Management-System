@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hakem Başvurusu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-control-file {
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2>Hakem Başvurusu</h2>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for message, category in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="/hakem_basvuru" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="ad_soyad">Ad Soyad:</label>
+                        <input type="text" class="form-control" id="ad_soyad" name="ad_soyad" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tc_kimlik_no">TC Kimlik No:</label>
+                        <input type="text" class="form-control" id="tc_kimlik_no" name="tc_kimlik_no" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kutuk_no">Kütük No (Opsiyonel):</label>
+                        <input type="text" class="form-control" id="kutuk_no" name="kutuk_no" readonly>
+						    <small class="form-text text-muted">Kütük No Alanı: Bu alan, kurs sonunda Federasyon tarafından sizlere atanacak numarayı içermektedir. Merkez Hakem Kurulu (MHK) tarafından doldurulacağı için, bu alanın boş bırakılması gerekmektedir.</small> <!-- Açıklama metni -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dogum_tarihi">Doğum Tarihi:</label>
+                        <input type="date" class="form-control" id="dogum_tarihi" name="dogum_tarihi" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefon">Telefon:</label>
+                        <input type="text" class="form-control" id="telefon" name="telefon" required>
+												 <small class="form-text text-muted">Telefon Numarası: Numaranızı başında sıfır olmaksızın ve arada boşluk bırakmadan girmeniz gerekmektedir.<br>Örnek: 5551234567</small> <!-- Açıklama metni -->
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eposta">E-posta:</label>
+                        <input type="email" class="form-control" id="eposta" name="eposta" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="iban">IBAN:</label>
+                        <input type="text" class="form-control" id="iban" name="iban" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adres">Adres:</label>
+                        <textarea class="form-control" id="adres" name="adres" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="il">İl:</label>
+                        <input type="text" class="form-control" id="il" name="il" required>
+                    </div>
+
+<div class="form-group">
+    <label for="izin_adresi">İzin Yeri ve Adresi (Opsiyonel):</label>
+    <textarea class="form-control" id="izin_adresi" name="izin_adresi"></textarea>
+    <small class="form-text text-muted">İzin Yeri ve Adresi:<br> Federasyon tarafından izin gönderilmesine ihtiyacınız varsa!<br> Müsabaka zamanları federasyon tarafından gönderilecek olan izin yerinin ve adresinin bilgilerini bu alana giriniz.</small> <!-- Açıklama metni -->
+</div>
+
+
+                    <div class="mb-3">
+                        <label for="foto">Fotoğraf:</label>
+                        <input type="file" class="form-control-file" id="foto" name="foto" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cezasi_yoktur_belgesi">Cezası Yoktur Belgesi:</label>
+                        <input type="file" class="form-control-file" id="cezasi_yoktur_belgesi" name="cezasi_yoktur_belgesi" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ogrenim_belgesi">Öğrenim Belgesi/Diploma:</label>
+                        <input type="file" class="form-control-file" id="ogrenim_belgesi" name="ogrenim_belgesi" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nufus_cuzdani_fotokopisi">Nüfus Cüzdanı:</label>
+                        <input type="file" class="form-control-file" id="nufus_cuzdani_fotokopisi" name="nufus_cuzdani_fotokopisi" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="adli_sicil_kaydi">Adli Sicil Kaydı:</label>
+                        <input type="file" class="form-control-file" id="adli_sicil_kaydi" name="adli_sicil_kaydi" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="saglik_raporu">Sağlık Raporu:</label>
+                        <input type="file" class="form-control-file" id="saglik_raporu" name="saglik_raporu" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dekont">Dekont:</label>
+                        <input type="file" class="form-control-file" id="dekont" name="dekont" required>
+                    </div>
+    <small class="form-text text-muted">Belge Yükleme Talimatları: Fotoğraf yükleme alanı JPG, JPEG ve PNG formatlarındaki dosyaları kabul etmektedir. Diğer belgelerin ise PDF formatında yüklenmesi rica olunur.</small> <!-- Açıklama metni -->
+
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary" value="Başvuru Yap">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

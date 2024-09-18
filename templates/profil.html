@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanıcı Profili{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h2>Kullanıcı Profili</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Kullanıcı Fotoğrafı -->
+<img src="{{ url_for('static', filename=profil.get('Foto', 'images/default_profile.png')) }}" alt="Profil Fotoğrafı" class="img-thumbnail">
+                </div>
+                <div class="col-md-8">
+                    <table class="table">
+                        <tbody>
+                            {% for key, value in profil.items() %}
+                            <tr>
+                                <th scope="row">{{ key|capitalize }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

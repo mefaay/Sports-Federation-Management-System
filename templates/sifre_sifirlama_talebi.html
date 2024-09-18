@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifre Sıfırlama Talebi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('static/images/arkaplan.jpg'); /* Arkaplan görseli */
+            background-size: cover; /* Görseli kapsama */
+            background-position: center; /* Görseli ortalama */
+        }
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.4); /* Saydam beyaz arka plan */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .logo-container {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+            margin-top: -60px;
+            perspective: 1000px; /* 3D efekt için */
+        }
+
+        .logo {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d; /* 3D dönüşü korur */
+            animation: spin 5s linear infinite; /* Dönen animasyon */
+        }
+        @keyframes spin {
+            from {
+                transform: rotateY(0deg); /* Başlangıç açısı */
+            }
+            to {
+                transform: rotateY(360deg); /* Bitiş açısı */
+            }
+        }
+
+        .logo img {
+            width: 150px; /* Logo genişliği */
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+            text-align: center;
+        }
+        p {
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: calc(100%);
+            padding: 14px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button[type="submit"], .btn, .btn-back {
+            width: 50%; /* Butonların genişliğini %50 yap */
+            padding: 14px;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none; /* A etiketinin varsayılan alt çizgisini kaldırır */
+            margin-bottom: 20px; /* Butonların alt boşluğunu ayarlar */
+        }
+        button[type="submit"] {
+            background-color: #007bff;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .btn-back {
+            background-color: #dc3545; /* Kırmızı renk */
+            margin-left: 4%; /* Butonlar arasındaki boşluğu ayarlar */
+        }
+        .btn-back:hover {
+            background-color: #c82333;
+        }
+        .alert {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 14px;
+            margin-bottom: 30px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .alert i {
+            margin-right: 10px;
+        }
+        .alert.success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .alert.error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            font-size: 9px;
+            color: #666;
+            padding: 0px 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        @media screen and (max-width: 768px) {
+            footer {
+                font-size: 9px;
+                padding: 2px 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="static/images/tmpflogo.png" alt="Company Logo" class="logo">
+        </div>
+        <h2>Şifre Sıfırlama Talebi</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <p>Şifre sıfırlama bağlantısını almak için telefon numaranızı girin.</p>
+        <form action="/sifre-sifirlama-talebi-gonder" method="post">
+            <label for="telefon">Telefon Numarası:</label>
+            <input type="text" id="telefon" name="telefon" placeholder="Telefon numaranızı giriniz" required>
+            <div style="display: flex; justify-content: space-between;">
+                <button type="submit" class="btn">Talep Gönder</button>
+                <a href="/login" class="btn-back"><i class="fas fa-arrow-left"></i>Geri Dön</a>
+            </div>
+        </form>
+    </div>
+    <footer class="text-center mt-4">
+        <p>&copy; 2024 Mefaay Technology FyS v13 Tüm hakları saklıdır.</p>
+    </footer>
+</body>
+</html>
